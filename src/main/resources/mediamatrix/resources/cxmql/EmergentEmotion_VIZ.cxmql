@@ -1,0 +1,7 @@
+VISUALIZE BY [TYPE=VIDEO,COLORSCHEME=CIS2,width=1200,height=600,threshold=1]
+FROM [ $FILE ] @(ColorImpression)
+WITH
+	ecs(TARGET) -> MAT1
+	histogram(MAT1) -> HISTOGRAM
+	selectAttributesMoreThan(HISTOGRAM, "average", 1) -> ATTRS
+	projection(MAT1, ATTRS) -> RESULT
