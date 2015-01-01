@@ -54,11 +54,7 @@ jar.doFirst {
         }
         logger.info 'Required requiredProjects: ' + requiredProjects
 
-        def compileFiles = configurations.compile.files{ it instanceof ExternalDependency }.collect  {
-            File file = it
-            "lib/${file.name}"
-        }.join(' ')
-
+        def compileFiles = configurations.compile.files{ it instanceof ExternalDependency }.collect{ it.name }.join(' ');
         def manifestPath = requiredProjects + compileFiles
         logger.info 'Manifest: '+ manifestPath
         attributes 'Class-Path': manifestPath
