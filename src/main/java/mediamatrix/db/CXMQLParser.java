@@ -2,7 +2,8 @@ package mediamatrix.db;
 
 import mediamatrix.utils.StringUtils;
 import java.util.List;
-import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlEngine;
 
 public class CXMQLParser {
 
@@ -18,7 +19,7 @@ public class CXMQLParser {
     }
 
     public CXMQLScript parse(String query) {
-        final JexlEngine engine = new JexlEngine();
+        final JexlEngine engine = new JexlBuilder().create();
         final CXMQLQueryScript script = new CXMQLQueryScript();
         final QueryByClause queryBy = new QueryByClause(engine);
         final FromClause from = new FromClause(engine);

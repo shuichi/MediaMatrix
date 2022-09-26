@@ -32,7 +32,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.ui.RectangleInsets;
+import org.jfree.chart.ui.RectangleInsets;
 
 public class JVMMemoryProfilerPanel extends javax.swing.JPanel {
 
@@ -75,7 +75,7 @@ public class JVMMemoryProfilerPanel extends javax.swing.JPanel {
         final XYItemRenderer renderer = new DefaultXYItemRenderer();
         renderer.setSeriesPaint(0, Color.red);
         renderer.setSeriesPaint(1, Color.green);
-        renderer.setBaseStroke(new BasicStroke(3f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+        renderer.setDefaultStroke(new BasicStroke(3f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
         final XYPlot plot = new XYPlot(dataset, domain, range, renderer);
         plot.setBackgroundPaint(Color.lightGray);

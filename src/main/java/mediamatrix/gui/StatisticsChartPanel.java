@@ -50,9 +50,9 @@ public class StatisticsChartPanel extends javax.swing.JPanel {
         plot.setRangeGridlinePaint(Color.white);
         plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
         final BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setBaseItemLabelFont(font);
-        renderer.setBaseItemLabelsVisible(true);
-        renderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        renderer.setDefaultItemLabelFont(font);
+        renderer.setDefaultItemLabelsVisible(true);
+        renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator());
         final CategoryAxis categoryAxis = plot.getDomainAxis();
         categoryAxis.setLabelFont(font);
         categoryAxis.setTickLabelFont(font);

@@ -4,6 +4,8 @@ import mediamatrix.db.FileOpenScriptGenerator;
 import mediamatrix.utils.FileNameUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -66,6 +68,27 @@ public class ExplorerPanel extends JScrollPane {
         taskPane.add((JComponent) queryGroup);
         taskPane.add((JComponent) vizGroup);
         vizGroup.setCollapsed(true);
+
+        dbList.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                System.out.println(e.getKeyCode());
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    final int index = dbList.getSelectedIndex();
+                    if (index > -1) {
+                        dbModel.remove(index);
+                    }
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
 
         deleteItem.addActionListener(new ActionListener() {
 

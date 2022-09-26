@@ -1,7 +1,7 @@
 package mediamatrix.db;
 
 import java.util.TreeMap;
-import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl3.JexlContext;
 
 public class CXMQLContext extends TreeMap<String, Object> implements JexlContext {
 

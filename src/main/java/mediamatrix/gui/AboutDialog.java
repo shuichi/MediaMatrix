@@ -78,13 +78,12 @@ public class AboutDialog extends javax.swing.JDialog {
 
         versionLabel.setText("version 2.0.8"); // NOI18N
 
-        jTextArea1.setColumns(20);
         jTextArea1.setEditable(false);
+        jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("MediaMatrix, Copyright © 2008 - 2010, Shuichi Kurabayashi,  All Rights Reserved. \n\nMediaMatrix is developped by Shuichi Kurabayashi and Sahori Imai.\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.  You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>. \n"); // NOI18N
+        jTextArea1.setText("MediaMatrix, Copyright © 2008 - 2022, Shuichi Kurabayashi,  All Rights Reserved. \n\nMediaMatrix is developped by Shuichi Kurabayashi.\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.  You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>. \n"); // NOI18N
         jTextArea1.setWrapStyleWord(true);
-        jTextArea1.setCaretPosition(1);
         aboutScrollPane.setViewportView(jTextArea1);
 
         aTabbedPane.addTab("About", aboutScrollPane);
@@ -105,12 +104,11 @@ public class AboutDialog extends javax.swing.JDialog {
 
         aTabbedPane.addTab("License", new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/gplv3.png")), gplScrollPane); // NOI18N
 
-        componentsTextArea.setColumns(20);
         componentsTextArea.setEditable(false);
+        componentsTextArea.setColumns(20);
         componentsTextArea.setLineWrap(true);
         componentsTextArea.setRows(5);
-        componentsTextArea.setText("MediaMatrix includes/uses the following softwares.\n\nApache Commons JEXL version 2.0.1\nCopyright 2001-2010 The Apache Software Foundation\nhttp://commons.apache.org/jexl/\nLisenced under the Apache License, Version 2.0\n\nApache Commons Logging version 1.0.16\nCopyright 2001-2007 The Apache Software Foundation\nhttp://commons.apache.org/logging/\nLisenced under the Apache License, Version 2.0\n\nThe JFreeChart Class Library Version 1.0.13\nCopyright, 2000-2009, by Object Refinery Limited and Contributors. All rights reserved.\nhttp://www.jfree.org/jfreechart/\nLicensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.\n\nThe JCommon Class Library Version 1.0.16\nCopyright, 2000-2009, by Object Refinery Limited and Contributors. All rights reserved.\nhttp://www.jfree.org/jcommon/\nLicensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.\n\nAbsolute Layout and Swing Layout Extensions are based on software from netbeans.org, which has been dual licensed under the Common Development and Distribution License (CDDL) and the GNU General Public License version 2 with Classpath exception. For more information, please visit www.netbeans.org.\n"); // NOI18N
-        componentsTextArea.setCaretPosition(1);
+        componentsTextArea.setText("MediaMatrix includes/uses the following softwares.\n\nApache Commons JEXL version 3.2.1\nhttp://commons.apache.org/jexl/\nLisenced under the Apache License, Version 2.0\n\nThe JFreeChart Class Library Version 1.5.3\nhttp://www.jfree.org/jfreechart/\nLicensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.\n\nSwingLabs SwingX Complete Version 1.6.5-1\nhttp://swingx.dev.java.net\nLicensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.\n\nFlatLaf Version 2.4\nhttps://www.formdev.com/flatlaf/\nLisenced under the Apache License, Version 2.0\n\nApache NetBeans Absolute Layout RELEASE150\nhttps://netbeans.apache.org\nLisenced under the Apache License, Version 2.0"); // NOI18N
         componentsScrollPane.setViewportView(componentsTextArea);
 
         aTabbedPane.addTab("Components", componentsScrollPane);
@@ -142,8 +140,8 @@ public class AboutDialog extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-624)/2, (screenSize.height-443)/2, 624, 443);
+        setSize(new java.awt.Dimension(624, 443));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
 private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed

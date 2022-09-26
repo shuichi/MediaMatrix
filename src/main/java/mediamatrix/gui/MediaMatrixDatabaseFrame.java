@@ -83,29 +83,29 @@ import mediamatrix.utils.IOUtilities;
 import org.jdesktop.swingx.JXStatusBar;
 
 public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
-
+    
     private static final long serialVersionUID = -2615961218813612330L;
     private final QueryEditor editor;
     private final ExplorerPanel explorer;
     private final QueryProgressDialog dialog;
-
+    
     public MediaMatrixDatabaseFrame() {
         initComponents();
         try {
             setIconImage(ImageIO.read(getClass().getResource("/mediamatrix/resources/Icon.png")));
         } catch (IOException ignored) {
         }
-
+        
         editor = new QueryEditor();
         explorer = new ExplorerPanel(editor);
         qrSplitPane.setTopComponent(new JScrollPane(editor));
         mainSplitPane.setLeftComponent(explorer);
         dialog = new QueryProgressDialog(this);
-
+        
         getContentPane().add(new JXStatusBar() {
-
+            
             private static final long serialVersionUID = 8229103383556972292L;
-
+            
             {
                 final JLabel statusLabel = new JLabel("version " + Version.VERSION);
                 final JXStatusBar.Constraint c1 = new JXStatusBar.Constraint();
@@ -115,14 +115,14 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                 add(statusLabel, c1);
                 add(gcButton, c2);
                 gcButton.addActionListener(new ActionListener() {
-
+                    
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         System.gc();
                     }
                 });
                 final Timer timer = new Timer(1000, new ActionListener() {
-
+                    
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         final DecimalFormat f1 = new DecimalFormat("#,###MB");
@@ -149,13 +149,13 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         }
         loadPrefs();
     }
-
+    
     public void executeScript(final String query) {
         dialog.init(100);
         new SwingWorker<MediaDatabaseTableModel, Double>() {
-
+            
             private CXMQLScript script;
-
+            
             @Override
             @SuppressWarnings("unchecked")
             public MediaDatabaseTableModel doInBackground() {
@@ -171,7 +171,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                     dialog.propertyChange(new PropertyChangeEvent(this, "complete", new Integer(1), new Integer(100)));
                 } catch (final Exception ex) {
                     SwingUtilities.invokeLater(new Runnable() {
-
+                        
                         @Override
                         public void run() {
                             ErrorUtils.showDialog(ex, MediaMatrixDatabaseFrame.this);
@@ -181,7 +181,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                 }
                 return model;
             }
-
+            
             @Override
             @SuppressWarnings("UseSpecificCatch")
             public void done() {
@@ -207,13 +207,13 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             }
         }.execute();
     }
-
+    
     public void executeVisualizeScript(final String query) {
         editor.setText(query);
         new SwingWorker<MediaMatrix, Double>() {
-
+            
             private CXMQLVisualizeScript script;
-
+            
             @Override
             protected MediaMatrix doInBackground() throws Exception {
                 MediaMatrix result = null;
@@ -223,7 +223,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                     result = script.eval();
                 } catch (final Exception ex) {
                     SwingUtilities.invokeLater(new Runnable() {
-
+                        
                         @Override
                         public void run() {
                             ErrorUtils.showDialog(ex, MediaMatrixDatabaseFrame.this);
@@ -233,7 +233,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                 }
                 return result;
             }
-
+            
             @Override
             protected void done() {
                 try {
@@ -258,7 +258,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             }
         }.execute();
     }
-
+    
     private void loadPrefs() {
         final Preferences prefs = Preferences.userNodeForPackage(getClass());
         final String dbListStr = prefs.get("database", "");
@@ -269,8 +269,8 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         qrSplitPane.setDividerLocation(prefs.getInt("qrdivider", 200));
         DialogUtils.loadWindowSize(this, 800, 600);
     }
-
-    private void storePrefs() {
+    
+    public void storePrefs() {
         final StringBuffer buff = new StringBuffer();
         final String[] dirs = explorer.getDatabase();
         for (int i = 0; i < dirs.length; i++) {
@@ -285,7 +285,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         prefs.putInt("qrdivider", qrSplitPane.getDividerLocation());
         prefs.put("database", buff.toString());
     }
-
+    
     public void showResult(JComponent table, String query) {
         aTabbedPane.add(query, table);
         aTabbedPane.setSelectedIndex(aTabbedPane.getTabCount() - 1);
@@ -302,20 +302,20 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         aTabbedPane.setTabComponentAt(aTabbedPane.getTabCount() - 1, panel);
         closeButton.setOpaque(false);
         closeButton.addMouseListener(new MouseAdapter() {
-
+            
             @Override
             public void mouseClicked(MouseEvent e) {
                 Component tabComp = ((Component) e.getSource()).getParent();
                 int index = aTabbedPane.indexOfTabComponent(tabComp);
                 aTabbedPane.remove(index);
             }
-
+            
             @Override
             public void mouseEntered(MouseEvent e) {
                 closeButton.setOpaque(true);
                 closeButton.setBackground(Color.white);
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 closeButton.setOpaque(false);
@@ -591,9 +591,9 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     class QueryResultPanel extends JPanel {
-
+        
         private static final long serialVersionUID = -1801889169157214469L;
-
+        
         public QueryResultPanel(final JTable table, final Map<String, Object> vars) {
             super(new BorderLayout());
             setBorder(BorderFactory.createEmptyBorder());
@@ -615,7 +615,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             toolbar.setOpaque(false);
             add(new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
             button.addActionListener(new ActionListener() {
-
+                
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (box.getSelectedIndex() > -1) {
@@ -632,11 +632,11 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             add(toolbar, BorderLayout.NORTH);
         }
     }
-
+    
     class VideoDatabaseTable extends JTable {
-
+        
         private static final long serialVersionUID = -5223630977672061873L;
-
+        
         public VideoDatabaseTable(final MediaDatabaseTableModel model) {
             super(model);
             setDoubleBuffered(true);
@@ -651,8 +651,10 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             cmodel.getColumn(2).setPreferredWidth(100);
             cmodel.getColumn(2).setWidth(100);
             cmodel.getColumn(2).setMaxWidth(100);
-            addMouseListener(new PopupInvoker(popup, this));
-
+            final PopupInvoker popupInvoker = new PopupInvoker(popup, this);
+            addMouseListener(popupInvoker);
+            addKeyListener(popupInvoker);
+            
             final JMenu script = new JMenu("Visualization Script");
             script.setMnemonic('S');
             for (File file : FileNameUtilities.getFilesInApplicationSubDirectory("CXMQL")) {
@@ -665,7 +667,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                         if (scriptObject.getType().equalsIgnoreCase("VIDEO")) {
                             final JMenuItem item = new JMenuItem(name);
                             item.addActionListener(new ActionListener() {
-
+                                
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     int rows[] = getSelectedRows();
@@ -699,7 +701,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             play.setMnemonic('P');
             final JMenuItem copyPath = new JMenuItem(new CopyPathAction(this, model));
             copyPath.setMnemonic('y');
-
+            
             popup.add(play);
             popup.addSeparator();
             popup.add(script);
@@ -714,11 +716,11 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             popup.add(copyPath);
         }
     }
-
+    
     class MusicDatabaseTable extends JTable {
-
+        
         private static final long serialVersionUID = 1L;
-
+        
         public MusicDatabaseTable(final MediaDatabaseTableModel model) {
             super(model);
             setDoubleBuffered(true);
@@ -733,7 +735,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             cmodel.getColumn(2).setWidth(100);
             cmodel.getColumn(2).setMaxWidth(100);
             addMouseListener(new PopupInvoker(popup, this));
-
+            
             final JMenu script = new JMenu("Visualization Script");
             script.setMnemonic('S');
             for (File file : FileNameUtilities.getFilesInApplicationSubDirectory("CXMQL")) {
@@ -746,7 +748,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                         if (scriptObject.getType().equalsIgnoreCase("MUSIC")) {
                             final JMenuItem item = new JMenuItem(name);
                             item.addActionListener(new ActionListener() {
-
+                                
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     int rows[] = getSelectedRows();
@@ -764,7 +766,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                     }
                 }
             }
-
+            
             final JMenuItem openInspector = new JMenuItem(new InspectorAction(this, model));
             openInspector.setMnemonic('I');
             final JMenuItem copy = new JMenuItem(new CopyAsOpenAction(this, model));
@@ -773,7 +775,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             showCorrelationMatrix.setMnemonic('E');
             final JMenuItem play = new JMenuItem(new PlayAction(this, model));
             play.setMnemonic('P');
-
+            
             popup.add(play);
             popup.addSeparator();
             popup.add(script);
@@ -784,11 +786,11 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             popup.add(copy);
         }
     }
-
+    
     class ImageDatabaseTable extends JTable {
-
+        
         private static final long serialVersionUID = 1L;
-
+        
         public ImageDatabaseTable(final MediaDatabaseTableModel model) {
             super(model);
             setDoubleBuffered(true);

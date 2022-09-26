@@ -1,7 +1,7 @@
 package mediamatrix.db;
 
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
 
 public class CXMQLExpression {
 

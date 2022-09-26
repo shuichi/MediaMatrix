@@ -34,7 +34,7 @@ import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleInsets;
+import org.jfree.chart.ui.RectangleInsets;
 
 public class StoryGraphPanel extends javax.swing.JPanel {
 
@@ -55,7 +55,7 @@ public class StoryGraphPanel extends javax.swing.JPanel {
         this.originalMat = mat;
         this.ivf = ivf;
         initComponents();
-        renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
+        renderer.setDefaultToolTipGenerator(new XYToolTipGenerator() {
 
             @Override
             public String generateToolTip(XYDataset dataset, int series, int item) {

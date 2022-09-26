@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
 
 public class FromClause {
 
@@ -73,7 +73,7 @@ public class FromClause {
             for (MediaMatrixGenerationClause generationClause : generationClauseList) {
                 final String name = "EACH_" + generationClause.getName();
                 if (expression.contains(name)) {
-                    final Expression jexlExpression = engine.createExpression("pe." + expression);
+                    final JexlExpression jexlExpression = engine.createExpression("pe." + expression);
                     final Object result = jexlExpression.evaluate(context);
                     context.set(name, result);
                 }

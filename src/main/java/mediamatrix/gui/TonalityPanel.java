@@ -16,7 +16,7 @@ import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleInsets;
+import org.jfree.chart.ui.RectangleInsets;
 
 public class TonalityPanel extends javax.swing.JPanel {
 
@@ -32,7 +32,7 @@ public class TonalityPanel extends javax.swing.JPanel {
     public TonalityPanel(MediaMatrix mat) {
         initComponents();
         this.mat = mat;
-        renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
+        renderer.setDefaultToolTipGenerator(new XYToolTipGenerator() {
 
             public String generateToolTip(XYDataset dataset, int series, int item) {
                 final XYSeriesCollection collection = (XYSeriesCollection) dataset;

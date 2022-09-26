@@ -3,7 +3,8 @@ package mediamatrix.db;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlEngine;
 
 public class CXMQLVisualizeScript {
 
@@ -16,7 +17,7 @@ public class CXMQLVisualizeScript {
 
     public CXMQLVisualizeScript() {
         super();
-        engine = new JexlEngine();
+        engine = new JexlBuilder().create();
         context = new CXMQLContext();
         pe = new PrimitiveEngine();
         context.set("pe", pe);

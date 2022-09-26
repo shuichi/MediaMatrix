@@ -47,8 +47,6 @@ import mediamatrix.music.MidiAnalyzer;
 import mediamatrix.music.Note;
 import mediamatrix.music.MusicScore;
 import mediamatrix.music.Tempo;
-import mediamatrix.utils.GoogleImageSearchAPI;
-import mediamatrix.utils.GoogleImageSearchResult;
 import mediamatrix.utils.IOUtilities;
 import mediamatrix.utils.Score;
 
@@ -99,15 +97,7 @@ public class PrimitiveEngine {
 
     public MediaDataObject[] openDB(String dirName) throws IOException {
         List<MediaDataObject> result = new ArrayList<MediaDataObject>();
-        if (dirName.startsWith("Google:")) {
-            final String[] elems = dirName.split(":");
-            final GoogleImageSearchAPI api = new GoogleImageSearchAPI(params.getProperty("GOOGLE"), params.getProperty("REFERER"));
-            final List<GoogleImageSearchResult> temp = api.search(elems[1], 20);
-            for (int i = 0; i < temp.size(); i++) {
-                GoogleImageSearchResult r = temp.get(i);
-                result.add(new MediaDataObject(r.getTbUrl(), r.getUrl()));
-            }
-        } else if (new File(dirName).exists() && new File(dirName).isDirectory()) {
+        if (new File(dirName).exists() && new File(dirName).isDirectory()) {
             final File dir = new File(dirName);
             File[] files = dir.listFiles(new ChronoArchiveFileFilter());
             if (files.length == 0) {
@@ -1122,6 +1112,7 @@ public class PrimitiveEngine {
         }
         return sum / mat2.getHeight();
     }
+
     public Set<Score<Integer, Double>> frame_correlation(MediaMatrix vec, MediaMatrix mat2) {
         final Set<Score<Integer, Double>> result = new TreeSet<Score<Integer, Double>>();
         for (int i = 0; i < mat2.getHeight(); i++) {

@@ -111,13 +111,12 @@
           <SubComponents>
             <Component class="javax.swing.JTextArea" name="jTextArea1">
               <Properties>
-                <Property name="columns" type="int" value="20"/>
                 <Property name="editable" type="boolean" value="false"/>
+                <Property name="columns" type="int" value="20"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="MediaMatrix, Copyright &#xa9; 2008 - 2010, Shuichi Kurabayashi,  All Rights Reserved. &#xa;&#xa;MediaMatrix is developped by Shuichi Kurabayashi and Sahori Imai.&#xa;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.  You should have received a copy of the GNU General Public License along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;. &#xa;" noResource="true"/>
+                <Property name="text" type="java.lang.String" value="MediaMatrix, Copyright &#xa9; 2008 - 2022, Shuichi Kurabayashi,  All Rights Reserved. &#xa;&#xa;MediaMatrix is developped by Shuichi Kurabayashi.&#xa;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.  You should have received a copy of the GNU General Public License along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;. &#xa;" noResource="true"/>
                 <Property name="wrapStyleWord" type="boolean" value="true"/>
-                <Property name="caretPosition" type="int" value="1"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -182,12 +181,11 @@
           <SubComponents>
             <Component class="javax.swing.JTextArea" name="componentsTextArea">
               <Properties>
-                <Property name="columns" type="int" value="20"/>
                 <Property name="editable" type="boolean" value="false"/>
+                <Property name="columns" type="int" value="20"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="MediaMatrix includes/uses the following softwares.&#xa;&#xa;Apache Commons JEXL version 2.0.1&#xa;Copyright 2001-2010 The Apache Software Foundation&#xa;http://commons.apache.org/jexl/&#xa;Lisenced under the Apache License, Version 2.0&#xa;&#xa;Apache Commons Logging version 1.0.16&#xa;Copyright 2001-2007 The Apache Software Foundation&#xa;http://commons.apache.org/logging/&#xa;Lisenced under the Apache License, Version 2.0&#xa;&#xa;The JFreeChart Class Library Version 1.0.13&#xa;Copyright, 2000-2009, by Object Refinery Limited and Contributors. All rights reserved.&#xa;http://www.jfree.org/jfreechart/&#xa;Licensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.&#xa;&#xa;The JCommon Class Library Version 1.0.16&#xa;Copyright, 2000-2009, by Object Refinery Limited and Contributors. All rights reserved.&#xa;http://www.jfree.org/jcommon/&#xa;Licensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.&#xa;&#xa;Absolute Layout and Swing Layout Extensions are based on software from netbeans.org, which has been dual licensed under the Common Development and Distribution License (CDDL) and the GNU General Public License version 2 with Classpath exception. For more information, please visit www.netbeans.org.&#xa;" noResource="true"/>
-                <Property name="caretPosition" type="int" value="1"/>
+                <Property name="text" type="java.lang.String" value="MediaMatrix includes/uses the following softwares.&#xa;&#xa;Apache Commons JEXL version 3.2.1&#xa;http://commons.apache.org/jexl/&#xa;Lisenced under the Apache License, Version 2.0&#xa;&#xa;The JFreeChart Class Library Version 1.5.3&#xa;http://www.jfree.org/jfreechart/&#xa;Licensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.&#xa;&#xa;SwingLabs SwingX Complete Version 1.6.5-1&#xa;http://swingx.dev.java.net&#xa;Licensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.&#xa;&#xa;FlatLaf Version 2.4&#xa;https://www.formdev.com/flatlaf/&#xa;Lisenced under the Apache License, Version 2.0&#xa;&#xa;Apache NetBeans Absolute Layout RELEASE150&#xa;https://netbeans.apache.org&#xa;Lisenced under the Apache License, Version 2.0" noResource="true"/>
               </Properties>
             </Component>
           </SubComponents>
