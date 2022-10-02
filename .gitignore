@@ -2,7 +2,6 @@
 .DS_Store
 .nb-gradle
 build/
-jre/
 
 # Ignore Gradle GUI config
 gradle-app.setting
