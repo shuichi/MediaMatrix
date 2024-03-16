@@ -105,7 +105,7 @@ public class CXMQLGenerateScript extends CXMQLScript {
             }));
         }
 
-        getPropertyChangeSupport().firePropertyChange("progress", new Integer(1), new Integer(0));
+        getPropertyChangeSupport().firePropertyChange("progress", 1, 0);
         try {
             for (int i = 0; i < futures.size(); i++) {
                 result.add(futures.get(i).get());
@@ -115,13 +115,13 @@ public class CXMQLGenerateScript extends CXMQLScript {
                 } else {
                     current = 100 * i / (files.length - 1);
                 }
-                getPropertyChangeSupport().firePropertyChange("progress", new Integer(previous), new Integer(current));
+                getPropertyChangeSupport().firePropertyChange("progress", previous, current);
                 previous = current;
             }
         } finally {
             executor.shutdown();
         }
-        getPropertyChangeSupport().firePropertyChange("progress", new Integer(previous), new Integer(100));
+        getPropertyChangeSupport().firePropertyChange("progress", previous, 100);
 
         return new CXMQLResultSet(result, getType());
     }

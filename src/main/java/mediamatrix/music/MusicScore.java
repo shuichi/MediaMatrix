@@ -258,7 +258,7 @@ public class MusicScore {
     public void setDividers(double[] newDividers) {
         division = new ArrayList<Double>();
         for (int i = 0; i < newDividers.length; i++) {
-            division.add(new Double(newDividers[i]));
+            division.add(newDividers[i]);
         }
     }
 
@@ -331,7 +331,7 @@ public class MusicScore {
     }
 
     public void addDivision(double time) {
-        division.add(new Double(time));
+        division.add(time);
     }
 
     public void clearDivision() {

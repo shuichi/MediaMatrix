@@ -78,7 +78,7 @@ public class CXMQLQueryScript extends CXMQLScript {
         queryBy.eval(context);
         from.prepare();
 
-        getPropertyChangeSupport().firePropertyChange("progress", new Integer(0), new Integer(1));
+        getPropertyChangeSupport().firePropertyChange("progress", 0, 1);
 
         for (int i = 0; i < from.size(); i++) {
             final int index = i;
@@ -113,7 +113,7 @@ public class CXMQLQueryScript extends CXMQLScript {
                 } else {
                     current = 100 * i / (from.size() - 1);
                 }
-                getPropertyChangeSupport().firePropertyChange("progress", new Integer(previous), new Integer(current));
+                getPropertyChangeSupport().firePropertyChange("progress", previous, current);
                 previous = current;
             }
         } finally {

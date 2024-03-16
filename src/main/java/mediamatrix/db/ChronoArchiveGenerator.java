@@ -86,15 +86,15 @@ public class ChronoArchiveGenerator {
         final Correlation[] correlations = ci.generateMetadata(histogram);
         final Map<String, Object> metadata = new TreeMap<String, Object>();
         for (int i = 0; i < correlations.length; i++) {
-            metadata.put(correlations[i].getWord(), new Double(correlations[i].getValue()));
+            metadata.put(correlations[i].getWord(), correlations[i].getValue());
         }
 
         final Set<String> keys = metadata.keySet();
         for (String key : keys) {
-            mat.set(new Double(arc.getTimeUnit() * index), key, ((Double) metadata.get(key)));
+            mat.set(arc.getTimeUnit() * index, key, ((Double) metadata.get(key)));
         }
         for (HSVColor c : ci.getColors()) {
-            cmat.set(new Double(arc.getTimeUnit() * index), c.getName(), ((Double) histogram.get(c).getValue()));
+            cmat.set(arc.getTimeUnit() * index, c.getName(), ((Double) histogram.get(c).getValue()));
         }
         arc.add(imageFile, index);
         if (index > 0) {

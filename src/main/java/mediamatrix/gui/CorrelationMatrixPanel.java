@@ -81,7 +81,7 @@ public class CorrelationMatrixPanel extends JPanel {
         pane = new JScrollPane(aTable);
         DefaultListModel<Double> model = new DefaultListModel<Double>();
         for (int i = 0; i < matrix.getHeight(); i++) {
-            model.addElement(new Double(i));
+            model.addElement(Double.valueOf(i));
         }
         pane.setRowHeaderView(new RowHeaderList(model, aTable));
 

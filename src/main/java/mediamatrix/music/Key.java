@@ -91,7 +91,7 @@ public class Key implements Serializable, Comparable<Key> {
 
     @Override
     public int compareTo(Key o) {
-        return new Double(this.score).compareTo(new Double(o.score));
+        return Double.valueOf(this.score).compareTo(o.score);
     }
 
     @Override

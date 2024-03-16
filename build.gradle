@@ -41,6 +41,11 @@ application {
     applicationName = 'MediaMatrix'
 }
 
+tasks.withType(JavaCompile) {
+  options.compilerArgs << '-Xlint:all'
+  options.deprecation = true
+}
+
 jar {
     manifest {
         attributes 'Implementation-Title': "MediaMatrix",

@@ -86,11 +86,11 @@ public class VideoMetadataGenerator {
                 final Correlation[] correlations = ci.generateMetadata(histogram);
                 final Map<String, Object> metadata = new TreeMap<String, Object>();
                 for (int j = 0; j < correlations.length; j++) {
-                    metadata.put(correlations[j].getWord(), new Double(correlations[j].getValue()));
+                    metadata.put(correlations[j].getWord(), correlations[j].getValue());
                 }
                 final Set<String> keys = metadata.keySet();
                 for (String key : keys) {
-                    mat.set(new Double(freq * i), key, ((Double) metadata.get(key)));
+                    mat.set(freq * i, key, ((Double) metadata.get(key)));
                 }
             }
         } catch (IOException ex) {

@@ -132,9 +132,9 @@ class NodeRelevance implements Comparable<NodeRelevance> {
 
     @Override
     public int compareTo(NodeRelevance o) {
-        int c = new Double(value).compareTo(o.value);
+        int c = Double.valueOf(value).compareTo(o.value);
         if (c == 0) {
-            c = new Integer(right.getLeafIndex()).compareTo(left.getLeafIndex());
+            c = Integer.valueOf(right.getLeafIndex()).compareTo(left.getLeafIndex());
         }
         return c;
     }

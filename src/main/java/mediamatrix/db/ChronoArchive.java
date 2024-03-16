@@ -193,9 +193,9 @@ public class ChronoArchive {
             global.put(THUMBNAIL, Boolean.FALSE);
         }
 
-        global.put(ITEM_COUNT, new Integer(count));
+        global.put(ITEM_COUNT, count);
         global.put(SEGMENT_SUFFIX, suffix);
-        global.put(TIME_UNIT, new Double(timeUnit));
+        global.put(TIME_UNIT, timeUnit);
         global.put(TIME_UNIT_TYPE, timeUnitType);
 
         final ZipOutputStream output = new ZipOutputStream(out);

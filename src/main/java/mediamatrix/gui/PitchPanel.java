@@ -102,7 +102,7 @@ class PitchMatrixXYDataset extends AbstractXYDataset implements XYDataset, Domai
         double maxX = Double.NEGATIVE_INFINITY;
 
         for (int i = 0; i < mat.getHeight(); i++) {
-            this.xValues[0][i] = new Double(mat.getRow(i));
+            this.xValues[0][i] = mat.getRow(i);
             if (this.xValues[0][i] < minX) {
                 minX = this.xValues[0][i];
             }
@@ -111,17 +111,17 @@ class PitchMatrixXYDataset extends AbstractXYDataset implements XYDataset, Domai
             }
             for (int j = 0; j < mat.getWidth(); j++) {
                 if (mat.get(i, j) > 0) {
-                    this.yValues[0][i] = new Double(j);
+                    this.yValues[0][i] = Double.valueOf(j);
                 }
             }
         }
 
-        this.domainMin = new Double(minX);
-        this.domainMax = new Double(maxX);
+        this.domainMin = minX;
+        this.domainMax = maxX;
         this.domainRange = new Range(minX, maxX);
 
-        this.rangeMin = new Double(0);
-        this.rangeMax = new Double(127);
+        this.rangeMin = Double.valueOf(0);
+        this.rangeMax = Double.valueOf(127);
         this.range = new Range(0, 127);
 
     }

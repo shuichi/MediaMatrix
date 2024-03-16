@@ -109,7 +109,7 @@ public class StoryGraphPanel extends javax.swing.JPanel {
             public void chartMouseMoved(ChartMouseEvent e) {
             }
         });
-        ((SpinnerNumberModel) clusterSpinner.getModel()).setMaximum(new Integer(mat.getHeight()));
+        ((SpinnerNumberModel) clusterSpinner.getModel()).setMaximum(mat.getHeight());
         ((SpinnerNumberModel) clusterSpinner.getModel()).setValue(1);
         maxLabel.setText("/" + mat.getHeight());
         yAxis.setAutoRangeIncludesZero(false);
@@ -127,7 +127,7 @@ public class StoryGraphPanel extends javax.swing.JPanel {
             @Override
             protected JFreeChart doInBackground() throws Exception {
                 final PrimitiveEngine pe = new PrimitiveEngine();
-                viewMat = pe.cluster(originalMat, ((Integer) clusterSpinner.getValue()).intValue());
+                viewMat = pe.cluster(originalMat, ((Integer) clusterSpinner.getValue()));
                 if (ivf != null) {
                     viewMat = pe.mult(viewMat, ivf);
                     viewMat = pe.topk(viewMat, 10);

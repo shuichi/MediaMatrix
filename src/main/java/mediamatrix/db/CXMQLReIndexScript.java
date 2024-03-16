@@ -126,7 +126,7 @@ public class CXMQLReIndexScript extends CXMQLScript {
                 } else {
                     current = 100 * i / (files.length - 1);
                 }
-                getPropertyChangeSupport().firePropertyChange("progress", new Integer(previous), new Integer(current));
+                getPropertyChangeSupport().firePropertyChange("progress", previous, current);
                 previous = current;
             }
         } finally {

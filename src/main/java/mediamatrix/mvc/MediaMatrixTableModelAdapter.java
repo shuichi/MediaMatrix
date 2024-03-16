@@ -29,7 +29,7 @@ public class MediaMatrixTableModelAdapter extends AbstractTableModel {
             BigDecimal bd = new BigDecimal(matrix.get(rowIndex, columnIndex));
             return bd.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
         } catch (NumberFormatException e) {
-            return new Double(0d);
+            return 0d;
         }
     }
 
