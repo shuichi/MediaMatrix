@@ -2,6 +2,7 @@ package mediamatrix.db;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class CorrelationScore implements Comparable<CorrelationScore>, Serializable {
 
@@ -36,7 +37,7 @@ public class CorrelationScore implements Comparable<CorrelationScore>, Serializa
     @Override
     public String toString() {
         BigDecimal aDecimal = new BigDecimal(value);
-        return word + ": " + aDecimal.setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return word + ": " + aDecimal.setScale(5, RoundingMode.HALF_UP).doubleValue();
     }
 
     @Override

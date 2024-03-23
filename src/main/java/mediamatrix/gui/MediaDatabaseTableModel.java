@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +24,15 @@ import mediamatrix.music.TonalityAnalyzer;
 import mediamatrix.utils.ImageUtilities;
 import mediamatrix.utils.Score;
 
-public class MediaDatabaseTableModel extends AbstractTableModel {
+public final class MediaDatabaseTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = -2001898417808046329L;
-    protected final CXMQLResultSet result;
-    protected final List<BufferedImage> images;
+    protected transient final CXMQLResultSet result;
+    protected transient final List<BufferedImage> images;
 
     public MediaDatabaseTableModel(CXMQLResultSet result) throws IOException, InvalidMidiDataException {
         this.result = result;
-        images = new ArrayList<BufferedImage>();
+        images = new ArrayList<>();
 
         if (result.getType().equalsIgnoreCase("Video")) {
             for (int i = 0; i < result.size(); i++) {
@@ -46,7 +47,6 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
                     position += 100 + 1;
                     for (Score<Integer, Double> score : frames) {
                         if (previous == score.key || Math.abs(previous - score.key) < 10) {
-                            continue;
                         } else {
                             try {
                                 g2.drawImage(ChronoArchive.getImage(new File(result.getId(i)), score.key), position, 0, 100, 50, Color.BLACK, null);
@@ -55,7 +55,7 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
                                     break;
                                 }
                                 previous = score.key;
-                            } catch (Exception e) {
+                            } catch (IOException e) {
                             }
                         }
                     }
@@ -72,8 +72,8 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
                 final Key[] keys = music.getKeys();
                 final Color[] colors = DefaultColorMap.SCRIABIN.visualize(keys);
                 int sum = 0;
-                for (int j = 0; j < colors.length; j++) {
-                    g.setColor(colors[j]);
+                for (Color color : colors) {
+                    g.setColor(color);
                     final int width = 300 / keys.length;
                     g.fillRect(sum, 0, width, 15);
                     sum += width;
@@ -83,7 +83,7 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
         } else if (result.getType().equalsIgnoreCase("Image")) {
             for (int i = 0; i < result.size(); i++) {
                 if (result.getId(i).startsWith("http://")) {
-                    images.add(ImageUtilities.createThumbnail(ImageIO.read(new URL(result.getId(i))), 50, 50));
+                    images.add(ImageUtilities.createThumbnail(ImageIO.read(URI.create(result.getId(i)).toURL()), 50, 50));
                 } else {
                     images.add(ImageUtilities.createThumbnail(ImageIO.read(new File(result.getId(i))), 50, 50));
                 }
@@ -108,11 +108,11 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
     }
 
     public URL getAsURL(int row) throws MalformedURLException {
-        return new URL(result.getId(row));
+        return URI.create(result.getId(row)).toURL();
     }
 
     public URL getEntityAsURL(int row) throws MalformedURLException {
-        return new URL(result.getEntityID(row));
+        return URI.create(result.getEntityID(row)).toURL();
     }
 
     @Override
@@ -129,17 +129,11 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object value = null;
         switch (columnIndex) {
-            case 0:
-                value = images.get(rowIndex);
-                break;
-            case 1:
-                value = result.getName(rowIndex);
-                break;
-            case 2:
-                value = result.getValue(rowIndex);
-                break;
-            default:
-                break;
+            case 0 -> value = images.get(rowIndex);
+            case 1 -> value = result.getName(rowIndex);
+            case 2 -> value = result.getValue(rowIndex);
+            default -> {
+            }
         }
         return value;
     }
@@ -148,17 +142,11 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
     public String getColumnName(int column) {
         String name = null;
         switch (column) {
-            case 0:
-                name = "Visual";
-                break;
-            case 1:
-                name = "Title";
-                break;
-            case 2:
-                name = "Correlation";
-                break;
-            default:
-                break;
+            case 0 -> name = "Visual";
+            case 1 -> name = "Title";
+            case 2 -> name = "Correlation";
+            default -> {
+            }
         }
         return name;
     }
@@ -167,17 +155,11 @@ public class MediaDatabaseTableModel extends AbstractTableModel {
     public Class<?> getColumnClass(int columnIndex) {
         Class<?> cls = String.class;
         switch (columnIndex) {
-            case 0:
-                cls = Image.class;
-                break;
-            case 1:
-                cls = String.class;
-                break;
-            case 2:
-                cls = Double.class;
-                break;
-            default:
-                break;
+            case 0 -> cls = Image.class;
+            case 1 -> cls = String.class;
+            case 2 -> cls = Double.class;
+            default -> {
+            }
         }
         return cls;
     }

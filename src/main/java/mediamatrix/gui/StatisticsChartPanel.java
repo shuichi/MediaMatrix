@@ -20,12 +20,12 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-public class StatisticsChartPanel extends javax.swing.JPanel {
+public final class StatisticsChartPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private JScrollPane view;
-    private Set<CorrelationScore> scores;
-    private String title;
+    private final transient Set<CorrelationScore> scores;
+    private final String title;
 
     public StatisticsChartPanel(String title, Set<CorrelationScore> scores) {
         initComponents();

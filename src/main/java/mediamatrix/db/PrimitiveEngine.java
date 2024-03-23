@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,7 +73,7 @@ public class PrimitiveEngine {
 
     public List<ImageShot> getImageShotList(MediaMatrix mat, double threshold) throws IOException {
         final ChronoArchive carc = new ChronoArchive(mat.getId());
-        final List<Double> sumList = new ArrayList<Double>();
+        final List<Double> sumList = new ArrayList<>();
         for (int i = 0; i < mat.getHeight(); i++) {
             double sum = 0d;
             for (int j = 0; j < mat.getWidth(); j++) {
@@ -86,7 +87,7 @@ public class PrimitiveEngine {
             totalSum += d;
         }
         final double average = totalSum / sumList.size();
-        final List<ImageShot> result = new ArrayList<ImageShot>();
+        final List<ImageShot> result = new ArrayList<>();
         for (int i = 0; i < sumList.size(); i++) {
             if (sumList.get(i) > average * threshold) {
                 result.add(new ImageShot(i, carc.getImage(i)));
@@ -96,7 +97,7 @@ public class PrimitiveEngine {
     }
 
     public MediaDataObject[] openDB(String dirName) throws IOException {
-        List<MediaDataObject> result = new ArrayList<MediaDataObject>();
+        List<MediaDataObject> result = new ArrayList<>();
         if (new File(dirName).exists() && new File(dirName).isDirectory()) {
             final File dir = new File(dirName);
             File[] files = dir.listFiles(new ChronoArchiveFileFilter());
@@ -106,11 +107,11 @@ public class PrimitiveEngine {
             if (files.length == 0) {
                 files = dir.listFiles(new ImageFilenameFilter());
             }
-            for (int i = 0; i < files.length; i++) {
-                result.add(new MediaDataObject(files[i].getAbsolutePath()));
+            for (File file : files) {
+                result.add(new MediaDataObject(file.getAbsolutePath()));
             }
         }
-        return result.toArray(new MediaDataObject[result.size()]);
+        return result.toArray(MediaDataObject[]::new);
     }
 
     public MediaMatrix open(MediaDataObject obj, String matrixName) throws IOException, MediaMatrixException {
@@ -121,25 +122,25 @@ public class PrimitiveEngine {
         MediaMatrix result = null;
         if (fileName.startsWith("http://")) {
             // TODO support other media types
-            result = convert(ImageIO.read(new URL(fileName)));
+            result = convert(ImageIO.read(URI.create(fileName).toURL()));
         } else if (fileName.contains(",")) {
             final String[] names = fileName.split(",");
-            final List<File> temp = new ArrayList<File>();
-            for (int i = 0; i < names.length; i++) {
-                final File f = new File(names[i].trim());
+            final List<File> temp = new ArrayList<>();
+            for (String name : names) {
+                final File f = new File(name.trim());
                 if (f.exists()) {
                     temp.add(f);
                 }
             }
-            final File[] files = temp.toArray(new File[temp.size()]);
+            final File[] files = temp.toArray(File[]::new);
             final ImageFilenameFilter imgFilter = new ImageFilenameFilter();
-            final List<BufferedImage> images = new ArrayList<BufferedImage>();
-            for (int i = 0; i < files.length; i++) {
-                if (imgFilter.accept(files[i].getParentFile(), files[i].getName())) {
-                    images.add(ImageIO.read(files[i]));
+            final List<BufferedImage> images = new ArrayList<>();
+            for (File file : files) {
+                if (imgFilter.accept(file.getParentFile(), file.getName())) {
+                    images.add(ImageIO.read(file));
                 }
             }
-            result = convert(images.toArray(new BufferedImage[images.size()]));
+            result = convert(images.toArray(BufferedImage[]::new));
         } else {
             final File file = new File(fileName);
             if (new MIDIFileFilter().accept(file.getParentFile(), file.getName())) {
@@ -219,7 +220,7 @@ public class PrimitiveEngine {
     }
 
     public MediaMatrix transmit(MediaMatrix mat, Properties props) throws IOException {
-        final Map<String, double[]> vectors = new TreeMap<String, double[]>();
+        final Map<String, double[]> vectors = new TreeMap<>();
         final Set<Object> propKeys = props.keySet();
         for (Object k : propKeys) {
             final String[] elems = props.getProperty(k.toString()).split(",");
@@ -230,7 +231,7 @@ public class PrimitiveEngine {
             vectors.put(k.toString(), defs);
         }
         final Set<String> keys = vectors.keySet();
-        final MediaMatrix result = new MediaMatrix(mat.getRows(), keys.toArray(new String[keys.size()]));
+        final MediaMatrix result = new MediaMatrix(mat.getRows(), keys.toArray(String[]::new));
         for (int i = 0; i < mat.getHeight(); i++) {
             for (String key : keys) {
                 double sum = 0;
@@ -329,7 +330,7 @@ public class PrimitiveEngine {
                 }
             }
             for (int j = 0; j < mat.getWidth(); j++) {
-                totalDuration += mat.get(i, j);
+                totalDuration += (int) mat.get(i, j);
                 inputProf[j] += mat.get(i, j);
 
             }
@@ -359,21 +360,15 @@ public class PrimitiveEngine {
                 }
 
                 String keyName;
-                if (key == 0 || key == 12) {
-                    keyName = "C";
-                } else if (key == 1 || key == 2 || key == 13 || key == 14) {
-                    keyName = "D";
-                } else if (key == 3 || key == 4 || key == 15 || key == 16) {
-                    keyName = "E";
-                } else if (key == 5 || key == 6 || key == 17 || key == 18) {
-                    keyName = "F";
-                } else if (key == 7 || key == 19) {
-                    keyName = "G";
-                } else if (key == 8 || key == 9 || key == 20 || key == 21) {
-                    keyName = "A";
-                } else {
-                    keyName = "B";
-                }
+                keyName = switch (key) {
+                    case 0, 12 -> "C";
+                    case 1, 2, 13, 14 -> "D";
+                    case 3, 4, 15, 16 -> "E";
+                    case 5, 6, 17, 18 -> "F";
+                    case 7, 19 -> "G";
+                    case 8, 9, 20, 21 -> "A";
+                    default -> "B";
+                };
                 if (key == 1 || key == 13 || key == 3 || key == 15 || key == 8 || key == 20 || key == 10 || key == 22) {
                     keyName += "b";
                 }
@@ -717,12 +712,12 @@ public class PrimitiveEngine {
         }
         final MediaMatrix mat = new MediaMatrix(noteRow, column);
         final Note[] notes = score.allNotes();
-        for (int j = 0; j < notes.length; j++) {
-            if (notes[j].getVelocity() > 0) {
-                for (double k = 0; k < notes[j].getLength(); k += (1000d * denomi)) {
-                    final double time = Math.ceil((k + notes[j].getStartTime()) / (1000d * denomi));
+        for (Note note : notes) {
+            if (note.getVelocity() > 0) {
+                for (double k = 0; k < note.getLength(); k += (1000d * denomi)) {
+                    final double time = Math.ceil((k + note.getStartTime()) / (1000d * denomi));
                     if (mat.containRow(time)) {
-                        mat.set(time, "p" + notes[j].getKeyNumber(), 1d);
+                        mat.set(time, "p" + note.getKeyNumber(), 1d);
                     } else {
                         System.err.println(mat.getId() + " does not contain row[" + time + "]");
                     }
@@ -734,9 +729,8 @@ public class PrimitiveEngine {
 
     public MediaMatrix convertContinuousPitch(MusicScore score, double denomi) {
         final Note[] notes = score.allNotes();
-        final TreeSet<Double> times = new TreeSet<Double>();
-        for (int i = 0; i < notes.length; i++) {
-            Note note = notes[i];
+        final TreeSet<Double> times = new TreeSet<>();
+        for (Note note : notes) {
             times.add(note.getStartTime() / (1000d * denomi));
         }
         final double[] noteRow = new double[times.size()];
@@ -749,9 +743,9 @@ public class PrimitiveEngine {
             column[i] = "p" + (i + 1);
         }
         final MediaMatrix pmat = new MediaMatrix(noteRow, column);
-        for (int i = 0; i < notes.length; i++) {
-            if (notes[i].getVelocity() > 0) {
-                pmat.set(notes[i].getStartTime() / (1000d * denomi), "p" + notes[i].getKeyNumber(), notes[i].getLength());
+        for (Note note : notes) {
+            if (note.getVelocity() > 0) {
+                pmat.set(note.getStartTime() / (1000d * denomi), "p" + note.getKeyNumber(), note.getLength());
             }
         }
         return pmat;
@@ -776,9 +770,8 @@ public class PrimitiveEngine {
 
     public MediaMatrix convertContinuousVelocity(MusicScore score, double denomi) {
         final Note[] notes = score.allNotes();
-        final TreeSet<Double> times = new TreeSet<Double>();
-        for (int i = 0; i < notes.length; i++) {
-            Note note = notes[i];
+        final TreeSet<Double> times = new TreeSet<>();
+        for (Note note : notes) {
             times.add(note.getStartTime() / (1000d * denomi));
         }
         final double[] noteRow = new double[times.size()];
@@ -787,8 +780,8 @@ public class PrimitiveEngine {
             noteRow[t++] = it.next();
         }
         final MediaMatrix vmat = new MediaMatrix(noteRow, new String[]{"velocity"});
-        for (int i = 0; i < notes.length; i++) {
-            vmat.set(notes[i].getStartTime() / (1000d * denomi), "velocity", notes[i].getVelocity());
+        for (Note note : notes) {
+            vmat.set(note.getStartTime() / (1000d * denomi), "velocity", note.getVelocity());
         }
         return vmat;
     }
@@ -829,7 +822,7 @@ public class PrimitiveEngine {
         ColorImpressionKnowledge ci = ColorImpressionDataStore.getColorImpressionKnowledge(res);
         if (ci == null) {
             if (res.startsWith("http://")) {
-                byte[] buff = IOUtilities.download(new URL(res));
+                byte[] buff = IOUtilities.download(URI.create(res).toURL());
                 ci = new ColorImpressionKnowledge();
                 ci.load(new ByteArrayInputStream(buff), "UTF-8");
             } else if (new File(res).exists()) {

@@ -26,6 +26,7 @@ import mediamatrix.mvc.DoubleTableCellRenderer;
 import mediamatrix.mvc.ImpressionWordTableCellRenderer;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -34,22 +35,22 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.AbstractTableModel;
 
-public class MunsellImagePanel extends javax.swing.JPanel {
+public final class MunsellImagePanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private DefaultComboBoxModel<String> csModel;
     private ColorImpressionKnowledge ci;
-    private BufferedImage image;
+    private transient BufferedImage image;
 
     public MunsellImagePanel() {
         initComponents();
-        csModel = new DefaultComboBoxModel<String>();
+        csModel = new DefaultComboBoxModel<>();
         try {
             final String[] ciList = ColorImpressionDataStore.getColorImpressionKnowledgeList();
             for (String ciName : ciList) {
                 csModel.addElement(ciName);
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             ErrorUtils.showDialog(ex, this);
         }
         csComboBox.setModel(csModel);
@@ -73,7 +74,7 @@ public class MunsellImagePanel extends javax.swing.JPanel {
         imageLabel.setIcon(new ImageIcon(image));
         clusteredImageLabel.setIcon(new ImageIcon(clusteredImage));
         final ColorHistogramScore[] scores = histogram.orderedScore();
-        final DefaultListModel<ColorHistogramScore> listModel = new DefaultListModel<ColorHistogramScore>();
+        final DefaultListModel<ColorHistogramScore> listModel = new DefaultListModel<>();
         for (ColorHistogramScore score : scores) {
             listModel.addElement(score);
         }
@@ -94,38 +95,29 @@ public class MunsellImagePanel extends javax.swing.JPanel {
 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
-                switch (columnIndex) {
-                    case 0:
-                        return correlations[rowIndex].getWord();
-                    case 1:
-                        return correlations[rowIndex].getValue();
-                    default:
-                        return null;
-                }
+                return switch (columnIndex) {
+                    case 0 -> correlations[rowIndex].getWord();
+                    case 1 -> correlations[rowIndex].getValue();
+                    default -> null;
+                };
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                switch (columnIndex) {
-                    case 0:
-                        return String.class;
-                    case 1:
-                        return Double.class;
-                    default:
-                        return null;
-                }
+                return switch (columnIndex) {
+                    case 0 -> String.class;
+                    case 1 -> Double.class;
+                    default -> null;
+                };
             }
 
             @Override
             public String getColumnName(int column) {
-                switch (column) {
-                    case 0:
-                        return "Color Scheme";
-                    case 1:
-                        return "Score";
-                    default:
-                        return null;
-                }
+                return switch (column) {
+                    case 0 -> "Color Scheme";
+                    case 1 -> "Score";
+                    default -> null;
+                };
             }
         });
     }
@@ -176,7 +168,7 @@ public class MunsellImagePanel extends javax.swing.JPanel {
     private void csComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_csComboBoxActionPerformed
         try {
             ci = ColorImpressionDataStore.getColorImpressionKnowledge(csModel.getSelectedItem().toString());
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             ErrorUtils.showDialog(ex, this);
         }
         updateImage();

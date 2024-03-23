@@ -22,6 +22,7 @@ import mediamatrix.music.DefaultColorMap;
 import mediamatrix.music.Key;
 import mediamatrix.music.KeyNameString;
 import mediamatrix.music.TonalMusic;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,12 +32,15 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serial;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+@SuppressWarnings("this-escape")
 public class ColoredMusicPanel extends javax.swing.JPanel implements KeyNameString {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private TonalMusic music;
     private ColorMap map;
@@ -47,6 +51,7 @@ public class ColoredMusicPanel extends javax.swing.JPanel implements KeyNameStri
     private int onMouse;
 
     public ColoredMusicPanel() {
+        super();
         setOpaque(true);
         setBackground(Color.WHITE);
         headerItem.setEnabled(false);

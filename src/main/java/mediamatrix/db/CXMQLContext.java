@@ -11,14 +11,17 @@ public class CXMQLContext extends TreeMap<String, Object> implements JexlContext
         super();
     }
 
+    @Override
     public boolean has(String name) {
         return containsKey(name);
     }
 
+    @Override
     public void set(String name, Object value) {
         put(name, value);
     }
 
+    @Override
     public Object get(String name) {
         return super.get(name);
     }

@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -27,7 +28,7 @@ public class IOUtilities {
     }
 
     public static byte[] download(String url, int connectTimeout, int readTimeout) throws IOException {
-        URLConnection con = new URL(url).openConnection();
+        URLConnection con = URI.create(url).toURL().openConnection();
         con.setConnectTimeout(connectTimeout);
         con.setReadTimeout(readTimeout);
         InputStream in = con.getInputStream();

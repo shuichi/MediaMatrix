@@ -20,20 +20,23 @@ package mediamatrix.munsell;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class ColorHistogram implements Serializable {
 
-    static final long serialVersionUID = 251895384982248119L;
-    private Map<HSVColor, ColorHistogramScore> scores;
+    @Serial
+    private static final long serialVersionUID = 251895384982248119L;
+    private TreeMap<HSVColor, ColorHistogramScore> scores;
 
     public ColorHistogram() {
     }
 
-    public ColorHistogram(Map<HSVColor, ColorHistogramScore> scores) {
+    public ColorHistogram(TreeMap<HSVColor, ColorHistogramScore> scores) {
         this.scores = scores;
     }
 
@@ -87,7 +90,7 @@ public class ColorHistogram implements Serializable {
         return scores;
     }
 
-    public void setScores(Map<HSVColor, ColorHistogramScore> scores) {
+    public void setScores(TreeMap<HSVColor, ColorHistogramScore> scores) {
         this.scores = scores;
     }
 

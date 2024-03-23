@@ -2,15 +2,18 @@ package mediamatrix.mvc;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.io.Serial;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+
 import mediamatrix.gui.ImageShot;
 
-public class ImageShotListCellRenderer extends JLabel implements ListCellRenderer<ImageShot> {
+public final class ImageShotListCellRenderer extends JLabel implements ListCellRenderer<ImageShot> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ImageShotListCellRenderer() {

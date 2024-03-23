@@ -16,15 +16,18 @@ import java.awt.Graphics;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
+import javax.sound.midi.InvalidMidiDataException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import org.jdesktop.swingx.JXStatusBar;
 
-public class MusicMediaMatrixPanel extends JPanel {
+public final class MusicMediaMatrixPanel extends JPanel {
 
     private static final long serialVersionUID = -8556901560943216300L;
     private File file;
@@ -73,7 +76,7 @@ public class MusicMediaMatrixPanel extends JPanel {
                 pe.setProperty("DIV_MODE", "RELATIVE");
             }
             InputStream input = new BufferedInputStream(new FileInputStream(file));
-            final Map<String, MediaMatrix> result = new TreeMap<String, MediaMatrix>();
+            final Map<String, MediaMatrix> result = new TreeMap<>();
             final double ratio = Double.parseDouble(pe.getProperty("RATIO"));
             final double denomi = Double.parseDouble(pe.getProperty("DENOMI"));
             final MidiAnalyzer analyzer = new MidiAnalyzer(input);
@@ -123,7 +126,7 @@ public class MusicMediaMatrixPanel extends JPanel {
                 tab.addTab("Pitch", new PitchPanel(metadata.get("Pitch")));
                 tab.addTab("Tempo", new TempoPanel(metadata.get("Tempo")));
                 tab.addTab("Velocity", new VelocityPanel(metadata.get("Velocity")));
-            } catch (Exception ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 ErrorUtils.showDialog(ex, MusicMediaMatrixPanel.this);
             }
         }
@@ -215,13 +218,13 @@ public class MusicMediaMatrixPanel extends JPanel {
                     final Key[] keys = music.getKeys();
                     final Color[] colors = DefaultColorMap.SCRIABIN.visualize(keys);
                     int sum = 35;
-                    for (int i = 0; i < colors.length; i++) {
-                        g.setColor(colors[i]);
+                    for (Color color : colors) {
+                        g.setColor(color);
                         final int pwidth = getWidth() / keys.length;
                         g.fillRect(sum, 0, pwidth, getHeight());
                         sum += pwidth;
                     }
-                } catch (Exception ex) {
+                } catch (IOException | InvalidMidiDataException ex) {
                     ErrorUtils.showDialog(ex, MusicMediaMatrixPanel.this);
                 }
             }

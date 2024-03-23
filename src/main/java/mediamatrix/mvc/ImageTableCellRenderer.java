@@ -3,6 +3,7 @@ package mediamatrix.mvc;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
+import java.io.Serial;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -11,8 +12,9 @@ import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-public class ImageTableCellRenderer extends JLabel implements TableCellRenderer, ListCellRenderer<Image> {
+public final class ImageTableCellRenderer extends JLabel implements TableCellRenderer, ListCellRenderer<Image> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ImageTableCellRenderer() {

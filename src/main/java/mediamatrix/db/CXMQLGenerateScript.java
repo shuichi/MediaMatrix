@@ -82,7 +82,7 @@ public class CXMQLGenerateScript extends CXMQLScript {
     public CXMQLResultSet eval() throws Exception {
 
         final ExecutorService executor = Executors.newFixedThreadPool(2);
-        final Set<MediaDataObjectScore> result = new TreeSet<MediaDataObjectScore>();
+        final TreeSet<MediaDataObjectScore> result = new TreeSet<MediaDataObjectScore>();
         final List<Future<MediaDataObjectScore>> futures = new ArrayList<Future<MediaDataObjectScore>>();
 
         for (int i = 0; i < files.length; i++) {

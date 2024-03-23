@@ -2,30 +2,22 @@ package mediamatrix.munsell;
 
 import mediamatrix.utils.CSV;
 import mediamatrix.utils.VectorUtils;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class ColorImpressionKnowledge {
+public class ColorImpressionKnowledge implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 3173787927085394572L;
 
     private HSVColor[] colors;
     private final ArrayList<String> csOrder;
@@ -35,10 +27,10 @@ public class ColorImpressionKnowledge {
     private static final int INTERVAL = 4;
 
     public ColorImpressionKnowledge() {
-        this.valueMap = new TreeMap<String, Double[]>();
-        this.mapper = new TreeMap<Integer, HSVColor>();
-        this.csOrder = new ArrayList<String>();
-        this.images = new TreeMap<String, BufferedImage>();
+        this.valueMap = new TreeMap<>();
+        this.mapper = new TreeMap<>();
+        this.csOrder = new ArrayList<>();
+        this.images = new TreeMap<>();
     }
 
     public ColorImpressionKnowledge duplicate() {
@@ -92,8 +84,8 @@ public class ColorImpressionKnowledge {
                 Color c = new Color(image.getRGB(i, j));
                 HSVColor output = getMunsellColor(c.getRed(), c.getGreen(), c.getBlue());
                 boolean isSelected = false;
-                for (int k = 0; k < selection.length; k++) {
-                    if (output.getName().startsWith(selection[k])) {
+                for (String selection1 : selection) {
+                    if (output.getName().startsWith(selection1)) {
                         target.setRGB(i, j, c.getRGB());
                         isSelected = true;
                         break;
@@ -125,7 +117,7 @@ public class ColorImpressionKnowledge {
     }
 
     public String[] getWords() {
-        return csOrder.toArray(new String[csOrder.size()]);
+        return csOrder.toArray(String[]::new);
     }
 
     public int wordToCode(String word) {
@@ -162,9 +154,9 @@ public class ColorImpressionKnowledge {
     }
 
     public ColorHistogram generateHistogram(BufferedImage image) {
-        final Map<HSVColor, ColorHistogramScore> scores = new TreeMap<HSVColor, ColorHistogramScore>();
-        for (int i = 0; i < colors.length; i++) {
-            scores.put(colors[i], new ColorHistogramScore(colors[i], image.getWidth() * image.getHeight()));
+        final TreeMap<HSVColor, ColorHistogramScore> scores = new TreeMap<>();
+        for (HSVColor color : colors) {
+            scores.put(color, new ColorHistogramScore(color, image.getWidth() * image.getHeight()));
         }
         for (int i = 0; i < image.getWidth(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {

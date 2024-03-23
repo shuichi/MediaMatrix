@@ -1,11 +1,14 @@
 package mediamatrix.gui;
 
 import mediamatrix.db.ChronoArchive;
+
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serial;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -15,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
+
 import mediamatrix.db.CorrelationScore;
 import mediamatrix.db.MediaMatrix;
 import mediamatrix.mvc.DoubleTableCellRenderer;
@@ -22,7 +26,7 @@ import mediamatrix.mvc.ImageTableCellRenderer;
 import mediamatrix.mvc.MultilineTableCellRenderer;
 import mediamatrix.utils.ImageUtilities;
 
-public class ChronoArchiveTable extends JTable {
+public final class ChronoArchiveTable extends JTable {
 
     private static final long serialVersionUID = -2615961218813612330L;
 
@@ -65,12 +69,13 @@ public class ChronoArchiveTable extends JTable {
     }
 }
 
-class CARCTableModel extends AbstractTableModel {
+final class CARCTableModel extends AbstractTableModel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private final ChronoArchive carc;
-    private WeakHashMap<Integer, BufferedImage> imgCache;
-    private WeakHashMap<Integer, String> strCache;
+    private transient final ChronoArchive carc;
+    private transient final WeakHashMap<Integer, BufferedImage> imgCache;
+    private transient final WeakHashMap<Integer, String> strCache;
 
     public CARCTableModel(final ChronoArchive carc) {
         this.carc = carc;
@@ -166,14 +171,14 @@ class CARCTableModel extends AbstractTableModel {
         }
         int i = 0;
         final StringBuffer buff = new StringBuffer();
-        for (Iterator<CorrelationScore> it = scores.iterator(); it.hasNext();) {
+        for (Iterator<CorrelationScore> it = scores.iterator(); it.hasNext(); ) {
             if (++i >= k) {
                 break;
             }
             CorrelationScore score = it.next();
             buff.append(carc.getColorImpressionKnowledge().toPrintName(score.getWord()));
             buff.append("=");
-            buff.append(new BigDecimal(score.getValue()).setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue());
+            buff.append(new BigDecimal(score.getValue()).setScale(5, RoundingMode.HALF_UP).doubleValue());
             if (it.hasNext() && i + 1 < k) {
                 buff.append(", ");
             }

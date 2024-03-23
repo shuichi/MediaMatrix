@@ -1,17 +1,20 @@
 package mediamatrix.db;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import mediamatrix.utils.Score;
 
 public class MediaDataObjectScore implements Comparable<MediaDataObjectScore>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1643318691129821182L;
+
     private MediaDataObject mediaObject;
-    private Map<String, CorrelationMatrix> matrices;
-    private Set<Score<Integer, Double>> frameCorrelation;
+    private TreeMap<String, CorrelationMatrix> matrices;
+    private TreeSet<Score<Integer, Double>> frameCorrelation;
     private double value;
 
     public MediaDataObjectScore() {
@@ -20,7 +23,7 @@ public class MediaDataObjectScore implements Comparable<MediaDataObjectScore>, S
     public MediaDataObjectScore(MediaDataObject mediaObject, double value) {
         this.mediaObject = mediaObject;
         this.value = value;
-        this.matrices = new TreeMap<String, CorrelationMatrix>();
+        this.matrices = new TreeMap<>();
     }
 
     public CorrelationMatrix getCorrelationMatrix(String key) {
@@ -31,11 +34,11 @@ public class MediaDataObjectScore implements Comparable<MediaDataObjectScore>, S
         this.matrices.put(key, correlationMatrix);
     }
 
-    public Set<Score<Integer, Double>> getFrameCorrelation() {
+    public TreeSet<Score<Integer, Double>> getFrameCorrelation() {
         return frameCorrelation;
     }
 
-    public void setFrameCorrelation(Set<Score<Integer, Double>> frameCorrelation) {
+    public void setFrameCorrelation(TreeSet<Score<Integer, Double>> frameCorrelation) {
         this.frameCorrelation = frameCorrelation;
     }
 

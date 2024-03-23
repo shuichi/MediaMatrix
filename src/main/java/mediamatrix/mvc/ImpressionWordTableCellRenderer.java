@@ -4,6 +4,7 @@ import mediamatrix.munsell.ColorImpressionKnowledge;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.io.Serial;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.ImageIcon;
@@ -11,10 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-public class ImpressionWordTableCellRenderer extends JLabel implements TableCellRenderer {
+public final class ImpressionWordTableCellRenderer extends JLabel implements TableCellRenderer {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private ColorImpressionKnowledge ci;
+    private final ColorImpressionKnowledge ci;
     private static final Map<String, ImageIcon> CACHE = new TreeMap<String, ImageIcon>();
 
     public ImpressionWordTableCellRenderer(float fontSize, ColorImpressionKnowledge ci) {

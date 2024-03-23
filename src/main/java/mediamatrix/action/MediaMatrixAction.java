@@ -8,7 +8,9 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -50,10 +52,10 @@ public class MediaMatrixAction extends AbstractAction {
                 aTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 aTable.setDefaultRenderer(Object.class, new MediaMatrixTableCellRenderer(12f));
                 aTable.createDefaultColumnsFromModel();
-                final DefaultListModel<Double> lmodel = new DefaultListModel<Double>();
+                final DefaultListModel<Double> lmodel = new DefaultListModel<>();
                 final double[] mrows = matrix.getRows();
                 for (double d : mrows) {
-                    lmodel.addElement(new BigDecimal(d).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue());
+                    lmodel.addElement(new BigDecimal(d).setScale(1, RoundingMode.HALF_UP).doubleValue());
                 }
                 final JScrollPane pane = new JScrollPane(aTable);
                 pane.setRowHeaderView(new RowHeaderList(lmodel, aTable));
@@ -66,7 +68,7 @@ public class MediaMatrixAction extends AbstractAction {
                     col.setHeaderRenderer(new MediaMatrixTableHeaderRenderer(matrix.getColumn(i), ci.getHistogramImage(matrix.getColumn(i))));
                 }
                 DialogUtils.showDialog(model.getValueAt(rows[0], 1).toString(), panel, table);
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 ErrorUtils.showDialog(ex, table);
             }
         }

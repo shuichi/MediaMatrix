@@ -2,12 +2,13 @@ package mediamatrix.mvc;
 
 import mediamatrix.db.MediaMatrix;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javax.swing.table.AbstractTableModel;
 
 public class MediaMatrixTableModelAdapter extends AbstractTableModel {
 
     private static final long serialVersionUID = -766449466523923420L;
-    private MediaMatrix matrix;
+    private final MediaMatrix matrix;
 
     public MediaMatrixTableModelAdapter(MediaMatrix matrix) {
         this.matrix = matrix;
@@ -27,7 +28,7 @@ public class MediaMatrixTableModelAdapter extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         try {
             BigDecimal bd = new BigDecimal(matrix.get(rowIndex, columnIndex));
-            return bd.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+            return bd.setScale(3, RoundingMode.HALF_UP).doubleValue();
         } catch (NumberFormatException e) {
             return 0d;
         }
@@ -35,7 +36,7 @@ public class MediaMatrixTableModelAdapter extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        String val = matrix.getColumn(column).toString();
+        String val = matrix.getColumn(column);
         return val;
     }
 

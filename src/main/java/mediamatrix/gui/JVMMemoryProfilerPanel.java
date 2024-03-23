@@ -21,7 +21,9 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.io.Serial;
 import javax.swing.BorderFactory;
+
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
@@ -34,14 +36,15 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.chart.ui.RectangleInsets;
 
-public class JVMMemoryProfilerPanel extends javax.swing.JPanel {
+public final class JVMMemoryProfilerPanel extends javax.swing.JPanel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private TimeSeries total;
-    private TimeSeries free;
-    private JVMMemoryProfiler profiler;
-    private int historyCount = 20;
-    private int frequency = 200;
+    private final TimeSeries total;
+    private final TimeSeries free;
+    private transient final JVMMemoryProfiler profiler;
+    private final int historyCount = 20;
+    private final int frequency = 200;
 
     public JVMMemoryProfilerPanel() {
         initComponents();
@@ -114,6 +117,7 @@ public class JVMMemoryProfilerPanel extends javax.swing.JPanel {
 
         add(buttonPanel, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
+
     private void stopWatchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopWatchButtonActionPerformed
         if (stopWatchButton.isSelected()) {
             profiler.start();
@@ -123,6 +127,7 @@ public class JVMMemoryProfilerPanel extends javax.swing.JPanel {
             stopWatchButton.setText("Start");
         }
     }//GEN-LAST:event_stopWatchButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton stopWatchButton;
     // End of variables declaration//GEN-END:variables

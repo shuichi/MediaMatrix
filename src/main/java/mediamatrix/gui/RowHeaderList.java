@@ -2,6 +2,7 @@ package mediamatrix.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.io.Serial;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -10,8 +11,9 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.table.JTableHeader;
 
-public class RowHeaderList extends JList<Double> {
+public final class RowHeaderList extends JList<Double> {
 
+    @Serial
     private static final long serialVersionUID = 3366785700812280035L;
 
     public RowHeaderList(ListModel<Double> model, JTable table) {
@@ -22,7 +24,9 @@ public class RowHeaderList extends JList<Double> {
 
     class RowHeaderRenderer extends JLabel implements ListCellRenderer<Double> {
 
+        @Serial
         private static final long serialVersionUID = 2493937942177532394L;
+        
         private final JTableHeader header;
 
         public RowHeaderRenderer(JTableHeader header) {

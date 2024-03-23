@@ -19,6 +19,7 @@ package mediamatrix.munsell;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class ColorHistogramScore implements Comparable<ColorHistogramScore>, Serializable {
 
@@ -83,7 +84,7 @@ public class ColorHistogramScore implements Comparable<ColorHistogramScore>, Ser
     @Override
     public String toString() {
         BigDecimal aDecimal = new BigDecimal(ratio);
-        return color.getName() + ": " + count + " (" + aDecimal.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue() + "%)";
+        return color.getName() + ": " + count + " (" + aDecimal.setScale(3, RoundingMode.HALF_UP).doubleValue() + "%)";
     }
 
     @Override

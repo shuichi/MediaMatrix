@@ -37,12 +37,12 @@ import java.util.TreeSet;
 
 public class KrumhanslSchmucklerKeyFinder implements KeyFinder {
 
-    private static double[] MAJOR_PROFILE = {6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88};
-    private static double[] MINOR_PROFILE = {6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17};
+    private static final double[] MAJOR_PROFILE = {6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88};
+    private static final double[] MINOR_PROFILE = {6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17};
 
     static {
         double total = 0.0;
-        double average = 0.0;
+        double average;
         for (int i = 0; i < 12; i++) {
             total += MAJOR_PROFILE[i];
         }
@@ -86,11 +86,11 @@ public class KrumhanslSchmucklerKeyFinder implements KeyFinder {
             }
         }
 
-        for (int i = 0; i < notes.length; i++) {
-            totalDuration += notes[i].getLength();
+        for (Note note : notes) {
+            totalDuration += (int) note.getLength();
             for (int y = 0; y < inputProf.length; y++) {
-                if (notes[i].getPitch() == y) {
-                    inputProf[y] += notes[i].getLength();
+                if (note.getPitch() == y) {
+                    inputProf[y] += note.getLength();
                 }
             }
         }
@@ -111,7 +111,7 @@ public class KrumhanslSchmucklerKeyFinder implements KeyFinder {
             input_sumsq += Math.pow((inputProf[i] - averageDuration), 2.0);
         }
 
-        final TreeSet<Key> score = new TreeSet<Key>();
+        final TreeSet<Key> score = new TreeSet<>();
         for (int key = 0; key < 24; key++) {
             double value = 0.0;
             for (int pc = 0; pc < 12; pc++) {

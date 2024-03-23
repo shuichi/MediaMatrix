@@ -1,5 +1,6 @@
 package mediamatrix.mvc;
 
+import java.io.Serial;
 import java.util.List;
 import javax.swing.AbstractListModel;
 import mediamatrix.gui.ImageShot;
@@ -7,8 +8,9 @@ import mediamatrix.utils.ImageUtilities;
 
 public class ImageShotListModel extends AbstractListModel<ImageShot> {
 
+    @Serial
     private static final long serialVersionUID = 5532643415531313382L;
-    private final List<ImageShot> images;
+    private transient final List<ImageShot> images;
 
     public ImageShotListModel(List<ImageShot> images) {
         this.images = images;

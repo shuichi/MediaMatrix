@@ -1,8 +1,13 @@
 package mediamatrix.db;
 
 import java.io.File;
+import java.io.Serial;
+import java.io.Serializable;
 
-public class MediaDataObject {
+public class MediaDataObject implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1643318691129821182L;
 
     private String name;
     private String id;

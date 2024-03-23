@@ -6,6 +6,7 @@ package mediamatrix.action;
 
 import mediamatrix.db.ChronoArchive;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -26,12 +27,13 @@ public class FrameAction extends AbstractAction {
         this.table = table;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         int rows[] = table.getSelectedRows();
         if (rows.length > 0) {
             try {
                 DialogUtils.showDialog(model.getValueAt(rows[0], 1).toString(), new JScrollPane(new ChronoArchiveTable(new ChronoArchive(model.getAsFile(rows[0])))), table);
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 ErrorUtils.showDialog(ex, table);
             }
         }

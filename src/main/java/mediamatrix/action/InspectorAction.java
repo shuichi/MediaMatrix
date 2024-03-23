@@ -29,6 +29,7 @@ public class InspectorAction extends AbstractAction {
         this.table = table;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         int rows[] = table.getSelectedRows();
         if (rows.length > 0) {
@@ -36,7 +37,7 @@ public class InspectorAction extends AbstractAction {
             if (new MIDIFileFilter().accept(file)) {
                 DialogUtils.showDialog(file.getName() + " - MediaMatrix Inspector", new MusicMediaMatrixPanel(file), table);
             } else {
-                BufferedImage image = null;
+                BufferedImage image;
                 try {
                     if (model.isURL(rows[0])) {
                         byte[] buff = IOUtilities.download(model.getEntityAsURL(rows[0]));

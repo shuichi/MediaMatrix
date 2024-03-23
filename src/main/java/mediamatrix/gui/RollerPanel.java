@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -55,13 +56,13 @@ import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import mediamatrix.mvc.ImageTableCellRenderer;
 
-public class RollerPanel extends JPanel {
+public final class RollerPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private final SpinnerNumberModel model = new SpinnerNumberModel(0.4d, 0.0d, 1.0d, 0.001d);
     private final JScrollPane hvScrollPane = new JScrollPane();
     private final File file;
-    private ChronoArchive carc;
+    private transient ChronoArchive carc;
 
     public RollerPanel(File file) {
         super(new BorderLayout());
@@ -71,12 +72,8 @@ public class RollerPanel extends JPanel {
         hvScrollPane.setBorder(BorderFactory.createEtchedBorder());
         final JSpinner spinner = new JSpinner(model);
         final JButton applyButton = new JButton("Apply");
-        applyButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateContent();
-            }
+        applyButton.addActionListener((ActionEvent e) -> {
+            updateContent();
         });
         final JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         spinner.setPreferredSize(new Dimension(100, applyButton.getPreferredSize().height));
@@ -90,7 +87,7 @@ public class RollerPanel extends JPanel {
 
     public static Set<Integer> selectDelimiters(ChronoArchive carc, double threshold) {
         final NeighborRelevance neighbor = carc.getNeighborRelevance();
-        final Set<Integer> delims = new TreeSet<Integer>();
+        final Set<Integer> delims = new TreeSet<>();
         for (int i = 0; i < neighbor.size(); i++) {
             if (neighbor.getValue(i) > threshold) {
                 delims.add((int) neighbor.getEnd(i));
@@ -102,12 +99,12 @@ public class RollerPanel extends JPanel {
     private void updateContent() {
         try {
             carc = new ChronoArchive(file);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             ErrorUtils.showDialog(ex, this);
             return;
         }
         final Set<Integer> delims = selectDelimiters(carc, model.getNumber().doubleValue());
-        final List<ClusterInformationPanel> panels = new ArrayList<ClusterInformationPanel>();
+        final List<ClusterInformationPanel> panels = new ArrayList<>();
         final StackableSplitPane aStackableSplitPane = new StackableSplitPane();
         int begin = 0;
         int index = 0;
@@ -126,14 +123,15 @@ public class RollerPanel extends JPanel {
         hvScrollPane.getViewport().setView(aStackableSplitPane);
     }
 
-    class ClusterInformationPanel extends JPanel {
+    final class ClusterInformationPanel extends JPanel {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public ClusterInformationPanel(final int index, final ChronoArchive c) {
             super(new BorderLayout());
             add(new JLabel("" + index), BorderLayout.NORTH);
-            final JList<Image> aList = new JList<Image>();
+            final JList<Image> aList = new JList<>();
             final JSplitPane aSplitPane = new JSplitPane();
             final JScrollPane listScrollPane = new JScrollPane();
             final JTable scoreTable = new JTable();
@@ -161,7 +159,7 @@ public class RollerPanel extends JPanel {
             aList.setVisibleRowCount(0);
             aList.setModel(new CARCListModel(carc, c));
 
-            scoreTable.setModel(new CorrelationScoreTableModel(new ArrayList<CorrelationScore>(pe.sortedScore(pe.histogram(mat)))));
+            scoreTable.setModel(new CorrelationScoreTableModel(new ArrayList<>(pe.sortedScore(pe.histogram(mat)))));
             final ColorImpressionKnowledge ci = carc.getColorImpressionKnowledge();
             scoreTable.setDefaultRenderer(String.class, new ImpressionWordTableCellRenderer(14f, ci));
             scoreTable.setDefaultRenderer(Double.class, new DoubleTableCellRenderer(13f, 2));
@@ -189,14 +187,14 @@ public class RollerPanel extends JPanel {
 class CARCListModel extends AbstractListModel<Image> {
 
     private static final long serialVersionUID = 1L;
-    private final ChronoArchive originalCarc;
-    private final ChronoArchive carc;
-    private WeakHashMap<Integer, BufferedImage> imgCache;
+    private final transient ChronoArchive originalCarc;
+    private final transient ChronoArchive carc;
+    private final transient WeakHashMap<Integer, BufferedImage> imgCache;
 
     public CARCListModel(ChronoArchive originalCarc, ChronoArchive carc) {
         this.originalCarc = originalCarc;
         this.carc = carc;
-        imgCache = new WeakHashMap<Integer, BufferedImage>();
+        imgCache = new WeakHashMap<>();
     }
 
     @Override

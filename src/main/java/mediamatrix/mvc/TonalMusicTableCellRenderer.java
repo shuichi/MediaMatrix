@@ -2,6 +2,7 @@ package mediamatrix.mvc;
 
 import mediamatrix.gui.ColoredMusicPanel;
 import mediamatrix.music.TonalMusic;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
@@ -9,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-public class TonalMusicTableCellRenderer extends ColoredMusicPanel implements TableCellRenderer {
+public final class TonalMusicTableCellRenderer extends ColoredMusicPanel implements TableCellRenderer {
 
     private static final long serialVersionUID = 1L;
 

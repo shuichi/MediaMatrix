@@ -14,13 +14,13 @@ public class BatchGenerator {
         File[] files = dir.listFiles(new VideoFileFilter());
         File[] generated = dir.listFiles(new ChronoArchiveFileFilter());
         final ColorImpressionKnowledge ci = ColorImpressionDataStore.getColorImpressionKnowledge("CIS2");
-        for (int i = 0; i < files.length; i++) {
-            if (isAlreadyGenerated(files[i], generated)) {
-                System.out.println("Skipped : " + files[i].getName());
+        for (File file : files) {
+            if (isAlreadyGenerated(file, generated)) {
+                System.out.println("Skipped : " + file.getName());
             } else {
                 long start = System.currentTimeMillis();
-                System.out.println("Video : " + files[i].getName());
-                final File infile = files[i];
+                System.out.println("Video : " + file.getName());
+                final File infile = file;
                 final File outfile = new File(infile.getParentFile(), infile.getName().substring(0, infile.getName().lastIndexOf('.')) + ".carc");
                 final ChronoArchiveGenerator generator = new ChronoArchiveGenerator(infile, outfile, 0, 1, ci);
                 generator.capture();
@@ -31,7 +31,7 @@ public class BatchGenerator {
                 }
                 generator.finish();
                 long end = System.currentTimeMillis();
-                System.out.println("Processed " + files[i].getName() + " in " + ((end - start) / 1000) + " sec.");
+                System.out.println("Processed " + file.getName() + " in " + ((end - start) / 1000) + " sec.");
             }
         }
     }

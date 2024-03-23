@@ -5,34 +5,31 @@ import java.util.Arrays;
 import java.util.List;
 
 public class UnionModuleLoader implements DynamicModuleLoader {
-    
-    private DynamicModuleLoader[] loaders;
-    
+
+    private final DynamicModuleLoader[] loaders;
+
     public UnionModuleLoader(DynamicModuleLoader[] loaders) {
         this.loaders = loaders;
     }
 
-    
     @Override
     public Class<?>[] getPlugins(Class<?> baseClass) {
-        final List<Class<?>> result = new ArrayList<Class<?>>();
-        for (int i = 0; i < loaders.length; i++) {
-            Class<?>[] modules = loaders[i].getPlugins(baseClass);
+        final List<Class<?>> result = new ArrayList<>();
+        for (DynamicModuleLoader loader : loaders) {
+            Class<?>[] modules = loader.getPlugins(baseClass);
             result.addAll(Arrays.asList(modules));
         }
-        return result.toArray(new Class<?>[result.size()]);
+        return result.toArray(Class<?>[]::new);
     }
-    
-    
-    
+
     @Override
     public Class<?>[] getPlugins() {
-        final List<Class<?>> result = new ArrayList<Class<?>>();
-        for (int i = 0; i < loaders.length; i++) {
-            Class<?>[] modules = loaders[i].getPlugins();
+        final List<Class<?>> result = new ArrayList<>();
+        for (DynamicModuleLoader loader : loaders) {
+            Class<?>[] modules = loader.getPlugins();
             result.addAll(Arrays.asList(modules));
         }
-        return result.toArray(new Class<?>[result.size()]);
+        return result.toArray(Class<?>[]::new);
     }
-    
+
 }

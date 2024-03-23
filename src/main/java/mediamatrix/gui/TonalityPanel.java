@@ -8,7 +8,6 @@ import java.awt.Font;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.chart.title.LegendTitle;
@@ -18,7 +17,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.chart.ui.RectangleInsets;
 
-public class TonalityPanel extends javax.swing.JPanel {
+public final class TonalityPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private ChartPanel chartPanel = new ChartPanel(null);
@@ -32,14 +31,11 @@ public class TonalityPanel extends javax.swing.JPanel {
     public TonalityPanel(MediaMatrix mat) {
         initComponents();
         this.mat = mat;
-        renderer.setDefaultToolTipGenerator(new XYToolTipGenerator() {
-
-            public String generateToolTip(XYDataset dataset, int series, int item) {
-                final XYSeriesCollection collection = (XYSeriesCollection) dataset;
-                final XYSeries xyseries = collection.getSeries(series);
-                final XYDataItem xyitem = xyseries.getDataItem(item);
-                return xyseries.getKey().toString() + ": " + xyitem.getYValue();
-            }
+        renderer.setDefaultToolTipGenerator((XYDataset dataset, int series, int item) -> {
+            final XYSeriesCollection collection = (XYSeriesCollection) dataset;
+            final XYSeries xyseries = collection.getSeries(series);
+            final XYDataItem xyitem = xyseries.getDataItem(item);
+            return xyseries.getKey().toString() + ": " + xyitem.getYValue();
         });
         chartPanel.setDisplayToolTips(true);
         chartPanel.setMaximumDrawHeight(2000);

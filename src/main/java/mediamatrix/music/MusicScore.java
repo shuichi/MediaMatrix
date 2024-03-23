@@ -25,7 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MusicScore {
+public final class MusicScore {
 
     private static final String[] sm_astrKeySignatures = {"Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"};
     private String source;
@@ -36,7 +36,6 @@ public class MusicScore {
     private long lengthAsTick;
     private long lengthAsMicrosecond;
     private int resolution;
-    private boolean isTickPerBeat;
     private long microsecondsPerQuarterNote;
     private long smtpeOffset;
     private int timeSigElement;
@@ -50,8 +49,8 @@ public class MusicScore {
     private int programCode;
 
     public MusicScore() {
-        notes = new ArrayList<Note>();
-        tempo = new ArrayList<Tempo>();
+        notes = new ArrayList<>();
+        tempo = new ArrayList<>();
         clearDivision();
     }
 
@@ -84,7 +83,7 @@ public class MusicScore {
     }
 
     public void addTempo(Tempo t) {
-        if (tempo.size() == 0) {
+        if (tempo.isEmpty()) {
             baseTempo = t.getTempo();
         }
         tempo.add(t);
@@ -129,15 +128,15 @@ public class MusicScore {
     }
 
     public List<List<Key>> analyzeFullTonalityWithNSegment(int n, KeyFinder aKeyFinder) {
-        List<List<Key>> result = new ArrayList<List<Key>>();
+        List<List<Key>> result = new ArrayList<>();
         if (n == 1) {
             final Key[] keyScore = aKeyFinder.analyze(allNotes());
-            final List<Key> keys = new ArrayList<Key>();
+            final List<Key> keys = new ArrayList<>();
             result.add(keys);
-            for (int j = 0; j < keyScore.length; j++) {
-                keyScore[j].setLength(getLengthAsMicrosecond());
-                keyScore[j].setSec(1);
-                keys.add(keyScore[j]);
+            for (Key keyScore1 : keyScore) {
+                keyScore1.setLength(getLengthAsMicrosecond());
+                keyScore1.setSec(1);
+                keys.add(keyScore1);
             }
         } else {
             double length = divideByN(n);
@@ -145,17 +144,17 @@ public class MusicScore {
             for (int i = 1; i < divisionCount(); i++) {
                 Note[] tempNotes = division(i);
                 final Key[] keyScore = aKeyFinder.analyze(tempNotes);
-                final List<Key> keys = new ArrayList<Key>();
+                final List<Key> keys = new ArrayList<>();
                 result.add(keys);
-                for (int j = 0; j < keyScore.length; j++) {
-                    keyScore[j].setLength((int) length);
+                for (Key keyScore1 : keyScore) {
+                    keyScore1.setLength((int) length);
                     if (tempNotes.length > 0) {
                         previousEnd = (int) tempNotes[0].getEndTime() / 1000000;
-                        keyScore[j].setSec((int) (tempNotes[0].getStartTime() / 1000000));
+                        keyScore1.setSec((int) (tempNotes[0].getStartTime() / 1000000));
                     } else {
-                        keyScore[j].setSec(previousEnd);
+                        keyScore1.setSec(previousEnd);
                     }
-                    keys.add(keyScore[j]);
+                    keys.add(keyScore1);
                 }
             }
         }
@@ -163,16 +162,16 @@ public class MusicScore {
     }
 
     public List<List<Key>> analyzeFullTonalityWithNsecond(long microsec, KeyFinder aKeyFinder) {
-        List<List<Key>> result = new ArrayList<List<Key>>();
+        List<List<Key>> result = new ArrayList<>();
         divideByNSecond(microsec);
         for (int i = 1; i < divisionCount(); i++) {
             final Key[] keyScore = aKeyFinder.analyze(division(i));
-            final List<Key> keys = new ArrayList<Key>();
+            final List<Key> keys = new ArrayList<>();
             result.add(keys);
-            for (int j = 0; j < keyScore.length; j++) {
-                keyScore[j].setLength(microsec);
-                keyScore[j].setSec(i * (int) (microsec / 1000000) + 1);
-                keys.add(keyScore[j]);
+            for (Key keyScore1 : keyScore) {
+                keyScore1.setLength(microsec);
+                keyScore1.setSec(i * (int) (microsec / 1000000) + 1);
+                keys.add(keyScore1);
             }
         }
         return result;
@@ -180,16 +179,16 @@ public class MusicScore {
 
     public List<List<Key>> analyzeFullTonality(KeyFinder aKeyFinder) {
         final long barLength = getBarLength();
-        List<List<Key>> result = new ArrayList<List<Key>>();
+        List<List<Key>> result = new ArrayList<>();
         divideByBar();
         for (int i = 1; i < divisionCount(); i++) {
             final Key[] keyScore = aKeyFinder.analyze(division(i));
-            final List<Key> keys = new ArrayList<Key>();
+            final List<Key> keys = new ArrayList<>();
             result.add(keys);
-            for (int j = 0; j < keyScore.length; j++) {
-                keyScore[j].setLength(barLength);
-                keyScore[j].setSec(i + 1);
-                keys.add(keyScore[j]);
+            for (Key keyScore1 : keyScore) {
+                keyScore1.setLength(barLength);
+                keyScore1.setSec(i + 1);
+                keys.add(keyScore1);
             }
         }
         return result;

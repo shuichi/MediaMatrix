@@ -20,14 +20,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -41,22 +42,25 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-public class MediaInspectorPanel extends javax.swing.JPanel {
+public final class MediaInspectorPanel extends javax.swing.JPanel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private ColorSchemeSelectionPanel colorSchemeSelectionPanel;
+
+    private final ColorSchemeSelectionPanel colorSchemeSelectionPanel;
     private Point previous;
     private final JPanel canvasPanel;
-    private final List<MediaMatrixChart> chartList;
-    private final List<Lens> lensList;
+    private final LinkedList<MediaMatrixChart> chartList;
+    private final LinkedList<Lens> lensList;
     private final HandMoveMouseListener listener;
     private JDialog lensDialog;
-    private List<String> selectedWords;
+    private ArrayList<String> selectedWords;
 
+    @SuppressWarnings("unchecked")
     public MediaInspectorPanel() {
         initComponents();
-        chartList = new LinkedList<MediaMatrixChart>();
-        lensList = new LinkedList<Lens>();
+        chartList = new LinkedList<>();
+        lensList = new LinkedList<>();
         listener = new HandMoveMouseListener();
         canvasPanel = new JPanel() {
 
@@ -72,13 +76,8 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
         canvasPanel.setOpaque(true);
         canvasScrollPane.setViewportView(canvasPanel);
         colorSchemeSelectionPanel = new ColorSchemeSelectionPanel();
-        colorSchemeSelectionPanel.addPropertyChangeListener("colorschema", new PropertyChangeListener() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public void propertyChange(PropertyChangeEvent evt) {
-                selectedWords = (List<String>) evt.getNewValue();
-            }
+        colorSchemeSelectionPanel.addPropertyChangeListener("colorschema", (PropertyChangeEvent evt) -> {
+            selectedWords = (ArrayList<String>) evt.getNewValue();
         });
         add(colorSchemeSelectionPanel, BorderLayout.WEST);
         aFileChooser.setFileFilter(new ChronoArchiveFileFilter());
@@ -87,13 +86,13 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
     private void drawCharts() {
         canvasPanel.setVisible(false);
         canvasPanel.removeAll();
-        final List<Lens> reversedLens = new ArrayList<Lens>(lensList);
+        final List<Lens> reversedLens = new ArrayList<>(lensList);
         Collections.reverse(reversedLens);
         for (int i = 0; i < reversedLens.size(); i++) {
             Lens lens = reversedLens.get(i);
             canvasPanel.add(lens.getPanel(), new org.netbeans.lib.awtextra.AbsoluteConstraints(lens.getX(), 0, lens.getWidth(), canvasPanel.getHeight()));
         }
-        final List<MediaMatrixChart> reversed = new ArrayList<MediaMatrixChart>(chartList);
+        final List<MediaMatrixChart> reversed = new ArrayList<>(chartList);
         Collections.reverse(reversed);
         for (int i = 0; i < reversed.size(); i++) {
             MediaMatrixChart mediaMatrixChart = reversed.get(i);
@@ -125,7 +124,7 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
                     final ChronoArchive carc = mediaMatrixChart.getCarc();
                     final double ratio = (double) (lens.getX() - mediaMatrixChart.getX() - mediaMatrixChart.getXMargin()) / (double) (mediaMatrixChart.getLineWidth());
                     final int start = (int) ((carc.size() + ((Number) marginSpinner.getValue()).intValue()) * ratio);
-                    final DefaultListModel<ImageShot> model = new DefaultListModel<ImageShot>();
+                    final DefaultListModel<ImageShot> model = new DefaultListModel<>();
                     for (int i = start; i < (start + 5) && i < carc.size(); i++) {
                         try {
                             ImageShot shot = new ImageShot(i, ImageUtilities.imageToBufferedImage(ImageUtilities.createThumbnail(carc.getImage(i), 90, 90)));
@@ -418,16 +417,12 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
             final PrimitiveEngine pe = new PrimitiveEngine();
             final ChronoArchive carc = new ChronoArchive(file);
             MediaMatrix mat = carc.getMatrix();
-            SwingUtilities.invokeAndWait(new Runnable() {
-
-                @Override
-                public void run() {
-                    ColorImpressionKnowledge ci = carc.getColorImpressionKnowledge();
-                    colorSchemeSelectionPanel.setColorScheme(ci);
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                ColorImpressionKnowledge ci = carc.getColorImpressionKnowledge();
+                colorSchemeSelectionPanel.setColorScheme(ci);
             });
-            int width = ((Integer) widthSpinner.getModel().getValue()).intValue();
-            int height = ((Integer) heightSpinner.getModel().getValue()).intValue();
+            int width = ((Integer) widthSpinner.getModel().getValue());
+            int height = ((Integer) heightSpinner.getModel().getValue());
             mat = pe.projection(mat, selectedWords);
             final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height);
             return new MediaMatrixChart(new ChronoArchive(file), mat, image, chartList.size() * 20, chartList.size() * 20, image.getWidth(), image.getHeight());
@@ -437,8 +432,8 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
         protected void done() {
             try {
                 final MediaMatrixChart chart = get();
-                final JList<ImageShot> list = new JList<ImageShot>();
-                final DefaultListModel<ImageShot> model = new DefaultListModel<ImageShot>();
+                final JList<ImageShot> list = new JList<>();
+                final DefaultListModel<ImageShot> model = new DefaultListModel<>();
                 list.setFixedCellHeight(100);
                 list.setFixedCellWidth(100);
                 list.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
@@ -461,7 +456,7 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
                     mediaMatrixChart.getLabel().addMouseMotionListener(listener);
                 }
                 setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            } catch (Exception ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 ErrorUtils.showDialog(ex, MediaInspectorPanel.this);
             }
         }
@@ -474,8 +469,8 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
 
         @Override
         protected Object doInBackground() throws Exception {
-            int width = ((Integer) widthSpinner.getModel().getValue()).intValue();
-            int height = ((Integer) heightSpinner.getModel().getValue()).intValue();
+            int width = ((Integer) widthSpinner.getModel().getValue());
+            int height = ((Integer) heightSpinner.getModel().getValue());
             for (MediaMatrixChart chart : chartList) {
                 final PrimitiveEngine pe = new PrimitiveEngine();
                 final MediaMatrix mat = pe.projection(chart.getMatrix(), selectedWords);
@@ -508,8 +503,8 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
 
         @Override
         protected MediaMatrixChart doInBackground() throws Exception {
-            int width = ((Integer) widthSpinner.getModel().getValue()).intValue();
-            int height = ((Integer) heightSpinner.getModel().getValue()).intValue();
+            int width = ((Integer) widthSpinner.getModel().getValue());
+            int height = ((Integer) heightSpinner.getModel().getValue());
             final PrimitiveEngine pe = new PrimitiveEngine();
             final MediaMatrix mat = pe.projection(chart.getMatrix(), selectedWords);
             final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height);
@@ -530,12 +525,15 @@ public class MediaInspectorPanel extends javax.swing.JPanel {
         }
     }
 
-    class HandMoveMouseListener extends MouseAdapter implements MouseMotionListener {
+    class HandMoveMouseListener extends MouseAdapter implements MouseMotionListener, Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            if (e.getComponent() instanceof JLabel) {
-                final MediaMatrixChart chart = MediaMatrixChart.findByLabel(chartList, (JLabel) e.getComponent());
+            if (e.getComponent() instanceof JLabel jLabel) {
+                final MediaMatrixChart chart = MediaMatrixChart.findByLabel(chartList, jLabel);
                 int xdiff = e.getPoint().x - previous.x;
                 int ydiff = e.getPoint().y - previous.y;
                 chart.setX(chart.getX() + xdiff);
@@ -663,12 +661,14 @@ class Lens implements Serializable {
 
 class MediaMatrixChart implements Serializable {
 
-    public static final long serialVersionUID = 1L;
-    private ChronoArchive carc;
+    @Serial
+    private static final long serialVersionUID = 1L;
+    
+    private transient ChronoArchive carc;
     private JList<ImageShot> list;
     private MediaMatrix matrix;
-    private BufferedImage image;
-    private BufferedImage alphaImage;
+    private transient BufferedImage image;
+    private transient BufferedImage alphaImage;
     private JLabel label;
     private int x;
     private int y;

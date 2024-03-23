@@ -20,7 +20,7 @@ package mediamatrix.munsell;
 import java.awt.Color;
 import java.io.Serializable;
 
-public class HSVColor extends Color implements Serializable, Comparable<HSVColor> {
+public final class HSVColor extends Color implements Serializable, Comparable<HSVColor> {
 
     static final long serialVersionUID = 3423377840286848289L;
     private String hueName;

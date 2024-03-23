@@ -36,7 +36,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.chart.ui.RectangleInsets;
 
-public class StoryGraphPanel extends javax.swing.JPanel {
+public final class StoryGraphPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private ChartPanel chartPanel = new ChartPanel(null);
@@ -48,22 +48,18 @@ public class StoryGraphPanel extends javax.swing.JPanel {
     private MediaMatrix viewMat;
     private MediaMatrix ivf;
     private Color bgColor = Color.lightGray;
-    private ChronoArchive carc;
+    private transient ChronoArchive carc;
 
     public StoryGraphPanel(ChronoArchive c, MediaMatrix mat, MediaMatrix ivf) {
         this.carc = c;
         this.originalMat = mat;
         this.ivf = ivf;
         initComponents();
-        renderer.setDefaultToolTipGenerator(new XYToolTipGenerator() {
-
-            @Override
-            public String generateToolTip(XYDataset dataset, int series, int item) {
-                final XYSeriesCollection collection = (XYSeriesCollection) dataset;
-                final XYSeries xyseries = collection.getSeries(series);
-                final XYDataItem xyitem = xyseries.getDataItem(item);
-                return xyseries.getKey().toString() + ": " + xyitem.getYValue() + " at " + xyitem.getXValue();
-            }
+        renderer.setDefaultToolTipGenerator((XYDataset dataset, int series, int item) -> {
+            final XYSeriesCollection collection = (XYSeriesCollection) dataset;
+            final XYSeries xyseries = collection.getSeries(series);
+            final XYDataItem xyitem = xyseries.getDataItem(item);
+            return xyseries.getKey().toString() + ": " + xyitem.getYValue() + " at " + xyitem.getXValue();
         });
         chartPanel.setDisplayToolTips(true);
         chartPanel.setMaximumDrawHeight(2000);
@@ -72,8 +68,8 @@ public class StoryGraphPanel extends javax.swing.JPanel {
             @Override
             public void chartMouseClicked(ChartMouseEvent e) {
                 if (e.getTrigger().getClickCount() >= 2) {
-                    if (e.getEntity() instanceof XYItemEntity) {
-                        final XYItemEntity entity = (XYItemEntity) e.getEntity();
+                    if (e.getEntity() instanceof XYItemEntity xYItemEntity) {
+                        final XYItemEntity entity = xYItemEntity;
                         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                         SwingWorker<BufferedImage, Object> worker = new SwingWorker<BufferedImage, Object>() {
 
@@ -92,7 +88,7 @@ public class StoryGraphPanel extends javax.swing.JPanel {
                                     dialog.pack();
                                     dialog.setLocationRelativeTo(null);
                                     dialog.setVisible(true);
-                                } catch (Exception ex) {
+                                } catch (InterruptedException | ExecutionException ex) {
                                     StringWriter out = new StringWriter();
                                     ex.printStackTrace(new PrintWriter(out));
                                     JOptionPane.showMessageDialog(StoryGraphPanel.this, out.toString(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -169,9 +165,7 @@ public class StoryGraphPanel extends javax.swing.JPanel {
                     aTabbedPane.addTab("Matrix", matrixPanel);
                     chartScrollPane.setViewportView(chartPanel);
                     repaint();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(StoryGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ExecutionException ex) {
+                } catch (InterruptedException | ExecutionException ex) {
                     Logger.getLogger(StoryGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

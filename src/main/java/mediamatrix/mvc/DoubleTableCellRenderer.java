@@ -3,15 +3,18 @@ package mediamatrix.mvc;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.io.Serial;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-public class DoubleTableCellRenderer extends JLabel implements TableCellRenderer {
+public final class DoubleTableCellRenderer extends JLabel implements TableCellRenderer {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private int scale;
+    private final int scale;
 
     public DoubleTableCellRenderer(float fontSize, int scale) {
         setOpaque(true);
@@ -26,8 +29,8 @@ public class DoubleTableCellRenderer extends JLabel implements TableCellRenderer
             if (d.isInfinite() || d.isNaN()) {
                 System.out.println(getClass().getName() + ": " + d + "@ row: " + row + ", col: " + column);
             } else {
-                BigDecimal bd = new BigDecimal((Double) value);
-                setText(bd.setScale(scale, BigDecimal.ROUND_HALF_UP).toString());
+                BigDecimal bd = BigDecimal.valueOf((Double) value);
+                setText(bd.setScale(scale, RoundingMode.HALF_UP).toString());
             }
         } else {
             setText(value.toString());

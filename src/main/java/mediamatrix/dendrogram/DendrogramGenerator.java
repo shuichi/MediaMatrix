@@ -1,7 +1,5 @@
 package mediamatrix.dendrogram;
 
-import mediamatrix.dendrogram.Node;
-import mediamatrix.dendrogram.StoryDendrogram;
 import mediamatrix.utils.ImageUtilities;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,17 +7,16 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import mediamatrix.db.ChronoArchive;
 
-public class DendrogramGenerator {
+public final class DendrogramGenerator {
 
     private final ChronoArchive arc;
-    private BufferedImage image;
-    private StoryDendrogram dendrogram;
+    private final BufferedImage image;
+    private final StoryDendrogram dendrogram;
 
     public DendrogramGenerator(ChronoArchive arc) throws IOException {
-        final List<Node> leaves = new ArrayList<Node>();
+        final ArrayList<Node> leaves = new ArrayList<>();
         for (int i = 0; i < arc.size(); i++) {
 //            leaves.add(new Node(arc.getColorHistogram(i), i));
         }

@@ -5,10 +5,11 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -28,28 +29,26 @@ import mediamatrix.munsell.ColorImpressionKnowledge;
 import mediamatrix.mvc.CARCImageShotListModel;
 import mediamatrix.mvc.ImageShotListCellRenderer;
 
-public class SelectableMediaMatrixVisualizerPanel extends JPanel {
+public final class SelectableMediaMatrixVisualizerPanel extends JPanel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private List<String> selectedWords;
+    
+    private ArrayList<String> selectedWords;
     private JLabel canvas;
     private CARCImageShotListModel model;
     private JList<ImageShot> list;
 
+    @SuppressWarnings("unchecked")
     public SelectableMediaMatrixVisualizerPanel(final File file, final int width, final int height) throws IOException {
         super(new BorderLayout());
         canvas = new JLabel();
         canvas.setHorizontalAlignment(SwingConstants.CENTER);
         final ColorSchemeSelectionPanel colorSchemeSelectionPanel = new ColorSchemeSelectionPanel();
-        colorSchemeSelectionPanel.addPropertyChangeListener("colorschema", new PropertyChangeListener() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public void propertyChange(PropertyChangeEvent evt) {
-                selectedWords = (List<String>) evt.getNewValue();
-            }
+        colorSchemeSelectionPanel.addPropertyChangeListener("colorschema", (PropertyChangeEvent evt) -> {
+            selectedWords = (ArrayList<String>) evt.getNewValue();
         });
-        list = new JList<ImageShot>();
+        list = new JList<>();
         list.setFixedCellHeight(100);
         list.setFixedCellWidth(100);
         list.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
@@ -70,13 +69,9 @@ public class SelectableMediaMatrixVisualizerPanel extends JPanel {
                 final PrimitiveEngine pe = new PrimitiveEngine();
                 final ChronoArchive carc = new ChronoArchive(file);
                 MediaMatrix mat = carc.getMatrix();
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        ColorImpressionKnowledge ci = carc.getColorImpressionKnowledge();
-                        colorSchemeSelectionPanel.setColorScheme(ci);
-                    }
+                SwingUtilities.invokeAndWait(() -> {
+                    ColorImpressionKnowledge ci = carc.getColorImpressionKnowledge();
+                    colorSchemeSelectionPanel.setColorScheme(ci);
                 });
                 model = new CARCImageShotListModel(carc);
                 mat = pe.projection(mat, selectedWords);
@@ -92,7 +87,7 @@ public class SelectableMediaMatrixVisualizerPanel extends JPanel {
                     revalidate();
                     repaint();
                     setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                } catch (Exception ex) {
+                } catch (InterruptedException | ExecutionException ex) {
                     ErrorUtils.showDialog(ex, SelectableMediaMatrixVisualizerPanel.this);
                 }
             }

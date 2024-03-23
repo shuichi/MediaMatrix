@@ -1,18 +1,23 @@
 package mediamatrix.db;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import mediamatrix.utils.Score;
 
-public class CXMQLResultSet {
+public class CXMQLResultSet implements Serializable {
 
-    private final List<MediaDataObjectScore> result;
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private final ArrayList<MediaDataObjectScore> result;
     private final String type;
 
-    public CXMQLResultSet(Set<MediaDataObjectScore> set, String type) {
-        this.result = new ArrayList<MediaDataObjectScore>(set);
+    public CXMQLResultSet(TreeSet<MediaDataObjectScore> set, String type) {
+        this.result = new ArrayList<>(set);
         this.type = type;
     }
 

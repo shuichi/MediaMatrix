@@ -1,12 +1,15 @@
 package mediamatrix.gui;
 
 import mediamatrix.db.CorrelationMatrix;
+
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.io.Serial;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -18,6 +21,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -26,7 +30,9 @@ import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class CorrelationMatrixPanel extends JPanel {
+import static java.math.RoundingMode.HALF_UP;
+
+public final class CorrelationMatrixPanel extends JPanel {
 
     private static final long serialVersionUID = 1403965100235015233L;
     private JTable aTable;
@@ -57,7 +63,7 @@ public class CorrelationMatrixPanel extends JPanel {
             public Object getValueAt(final int rowIndex, final int columnIndex) {
                 double result = 0d;
                 try {
-                    result = new BigDecimal(matrix.get(columnIndex, rowIndex)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    result = new BigDecimal(matrix.get(columnIndex, rowIndex)).setScale(3, HALF_UP).doubleValue();
                 } catch (NumberFormatException e) {
                     result = 0d;
                 }
@@ -141,15 +147,16 @@ public class CorrelationMatrixPanel extends JPanel {
     }
 }
 
-class CorrelationMatrixTableCellRenderer extends JLabel implements TableCellRenderer {
+final class CorrelationMatrixTableCellRenderer extends JLabel implements TableCellRenderer {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private List<Cell> cells;
+    private final ArrayList<Cell> cells;
 
     public CorrelationMatrixTableCellRenderer(float fontSize) {
         setOpaque(true);
         setFont(getFont().deriveFont(Font.PLAIN, fontSize));
-        cells = new ArrayList<Cell>();
+        cells = new ArrayList<>();
     }
 
     public void setColoredCell(int x, int y) {
@@ -184,7 +191,7 @@ class CorrelationMatrixTableCellRenderer extends JLabel implements TableCellRend
         return this;
     }
 
-    class Cell {
+    static class Cell {
 
         private final int x;
         private final int y;

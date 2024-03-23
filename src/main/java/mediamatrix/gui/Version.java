@@ -18,7 +18,7 @@ package mediamatrix.gui;
 
 public class Version {
 
-    public static final double MAJOR_VERSION = 2.9;
-    public static final int MINOR_VERSION = 10;
+    public static final double MAJOR_VERSION = 3.0;
+    public static final int MINOR_VERSION = 0;
     public static final String VERSION = MAJOR_VERSION + "." + MINOR_VERSION;
 }

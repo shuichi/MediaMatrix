@@ -28,7 +28,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
-import javax.swing.UIManager;
 import mediamatrix.db.FFMpegShotSet;
 import mediamatrix.gui.AboutDialog;
 import mediamatrix.gui.ErrorUtils;
@@ -44,19 +43,19 @@ public class MediaMatrix {
             if (!aFile.exists()) {
                 try {
                     final URL url = MediaMatrix.class.getResource("/mediamatrix/resources/cxmql/" + res + ".cxmql");
-                    final Reader input = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-                    final StringWriter output = new StringWriter();
-                    char[] buffer = new char[4096];
-                    int n = 0;
-                    while (-1 != (n = input.read(buffer))) {
-                        output.write(buffer, 0, n);
+                    final StringWriter output;
+                    try (Reader input = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
+                        output = new StringWriter();
+                        char[] buffer = new char[4096];
+                        int n = 0;
+                        while (-1 != (n = input.read(buffer))) {
+                            output.write(buffer, 0, n);
+                        }
                     }
-                    input.close();
-                    final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(aFile), "UTF-8"));
-                    writer.write(output.toString());
-                    writer.close();
+                    try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(aFile), "UTF-8"))) {
+                        writer.write(output.toString());
+                    }
                 } catch (IOException ex) {
-                    ex.printStackTrace();
                 }
             }
         }
@@ -66,27 +65,24 @@ public class MediaMatrix {
                 System.setProperty("ffmpeg", FFMpegShotSet.findExecutable("ffmpeg").getAbsolutePath());
             }
             System.setProperty("ffmpeg.version", FFMpegShotSet.version());
-        } catch (Exception ex) {
+        } catch (IOException | InterruptedException ex) {
         }
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    FlatLightLaf.setup();
-                    System.setProperty("apple.laf.useScreenMenuBar", "true");
-                    final MediaMatrixDatabaseFrame frame = new MediaMatrixDatabaseFrame();
-                    Desktop desktop = Desktop.getDesktop();
-                    desktop.setAboutHandler(e -> new AboutDialog(frame, true).setVisible(true));
-                    desktop.setQuitHandler((e, r) -> {
-                        frame.storePrefs();
-                        frame.dispose();
-                        System.exit(0);
-                    });
-                    frame.setVisible(true);
-                } catch (Exception ex) {
-                    ErrorUtils.showDialog(ex);
-                }
+        java.awt.EventQueue.invokeLater(() -> {
+            try {
+                FlatLightLaf.setup();
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
+                final MediaMatrixDatabaseFrame frame = new MediaMatrixDatabaseFrame();
+                Desktop desktop = Desktop.getDesktop();
+                desktop.setAboutHandler(e -> new AboutDialog(frame, true).setVisible(true));
+                desktop.setQuitHandler((e, r) -> {
+                    frame.storePrefs();
+                    frame.dispose();
+                    System.exit(0);
+                });
+                frame.setVisible(true);
+            } catch (Exception ex) {
+                ErrorUtils.showDialog(ex);
             }
         });
     }

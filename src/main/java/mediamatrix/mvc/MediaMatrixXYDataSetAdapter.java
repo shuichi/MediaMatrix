@@ -4,7 +4,7 @@ import mediamatrix.db.MediaMatrix;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class MediaMatrixXYDataSetAdapter extends XYSeriesCollection {
+public final class MediaMatrixXYDataSetAdapter extends XYSeriesCollection {
 
     private static final long serialVersionUID = 1L;
     private final MediaMatrix mat;

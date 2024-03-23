@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -41,10 +42,10 @@ import mediamatrix.mvc.ImageShotListModel;
 import mediamatrix.mvc.ImpressionWordListCellRenderer;
 import org.jdesktop.swingx.JXBusyLabel;
 
-public class VideoMediaMatrixVisualizerPanel extends JPanel {
+public final class VideoMediaMatrixVisualizerPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private VisualizeResult result;
+    private transient VisualizeResult result;
 
     public VideoMediaMatrixVisualizerPanel(final MediaMatrix matrix, final CXMQLVisualizeScript script) {
         super(new BorderLayout());
@@ -78,8 +79,8 @@ public class VideoMediaMatrixVisualizerPanel extends JPanel {
                         }
                     }
                 });
-                list = new JList<ImageShot>();
-                csList = new JList<CorrelationScore>();
+                list = new JList<>();
+                csList = new JList<>();
                 csList.setFixedCellHeight(60);
                 csList.setFixedCellWidth(130);
                 list.setFixedCellHeight(100);
@@ -123,13 +124,13 @@ public class VideoMediaMatrixVisualizerPanel extends JPanel {
                     public void valueChanged(ListSelectionEvent e) {
                         if (!list.isSelectionEmpty()) {
                             final ImageShot p = list.getSelectedValue();
-                            final TreeSet<CorrelationScore> score = new TreeSet<CorrelationScore>();
+                            final TreeSet<CorrelationScore> score = new TreeSet<>();
                             final int index = result.getMatrix().getRowIndex(p.getTime());
                             for (int i = 0; i < result.getMatrix().getWidth(); i++) {
                                 score.add(new CorrelationScore(result.getMatrix().getColumn(i), result.getMatrix().get(index, i)));
                             }
 
-                            final List<CorrelationScore> data = new ArrayList<CorrelationScore>(score);
+                            final List<CorrelationScore> data = new ArrayList<>(score);
                             csList.setCellRenderer(new ImpressionWordListCellRenderer(result.getCi(), 10f));
                             csList.setModel(new AbstractListModel<CorrelationScore>() {
 
@@ -188,7 +189,7 @@ public class VideoMediaMatrixVisualizerPanel extends JPanel {
                             revalidate();
                             repaint();
                             setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                        } catch (Exception ex) {
+                        } catch (InterruptedException | ExecutionException ex) {
                             ErrorUtils.showDialog(ex, VideoMediaMatrixVisualizerPanel.this);
                         }
                     }

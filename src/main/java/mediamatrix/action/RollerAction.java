@@ -20,6 +20,7 @@ public class RollerAction extends AbstractAction {
         this.table = table;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         int rows[] = table.getSelectedRows();
         if (rows.length > 0) {

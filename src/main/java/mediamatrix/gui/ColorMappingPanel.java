@@ -18,6 +18,7 @@
 package mediamatrix.gui;
 
 import mediamatrix.music.ColorMap;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -26,7 +27,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import javax.swing.JPanel;
 
-public class ColorMappingPanel extends JPanel {
+public final class ColorMappingPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private ColorMap aMap;

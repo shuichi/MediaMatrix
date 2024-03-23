@@ -15,7 +15,6 @@ public class CXMQLExportParser extends CXMQLParser {
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             if (line.startsWith("//") || line.startsWith("#")) {
-                continue;
             } else if (line.startsWith(EXPORT)) {
                 final String generate = line.split("WITH")[0];
                 final String with = line.split("WITH")[1].trim();

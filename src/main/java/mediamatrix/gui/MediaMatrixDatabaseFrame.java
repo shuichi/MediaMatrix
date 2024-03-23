@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serial;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -82,9 +84,11 @@ import mediamatrix.mvc.ImageTableCellRenderer;
 import mediamatrix.utils.IOUtilities;
 import org.jdesktop.swingx.JXStatusBar;
 
-public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
+public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
 
+    @Serial
     private static final long serialVersionUID = -2615961218813612330L;
+
     private final QueryEditor editor;
     private final ExplorerPanel explorer;
     private final QueryProgressDialog dialog;
@@ -114,38 +118,30 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                 final JXStatusBar.Constraint c2 = new JXStatusBar.Constraint();
                 add(statusLabel, c1);
                 add(gcButton, c2);
-                gcButton.addActionListener(new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        System.gc();
-                    }
+                gcButton.addActionListener((ActionEvent e) -> {
+                    System.gc();
                 });
-                final Timer timer = new Timer(1000, new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        final DecimalFormat f1 = new DecimalFormat("#,###MB");
-                        final DecimalFormat f2 = new DecimalFormat("##.#");
-                        final long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
-                        final long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
-                        final long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
-                        final long used = total - free;
-                        final double ratio = (used * 100 / (double) total);
-                        final String info = "Java Heap Total=" + f1.format(total) + ", " + "Used=" + f1.format(used) + " (" + f2.format(ratio) + "%), " + "Max=" + f1.format(max);
-                        gcButton.setText(info);
-                    }
+                final Timer timer = new Timer(1000, (ActionEvent e) -> {
+                    final DecimalFormat f1 = new DecimalFormat("#,###MB");
+                    final DecimalFormat f2 = new DecimalFormat("##.#");
+                    final long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+                    final long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+                    final long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+                    final long used = total - free;
+                    final double ratio = (used * 100 / (double) total);
+                    final String info = "Java Heap Total=" + f1.format(total) + ", " + "Used=" + f1.format(used) + " (" + f2.format(ratio) + "%), " + "Max=" + f1.format(max);
+                    gcButton.setText(info);
                 });
                 timer.start();
             }
         }, BorderLayout.SOUTH);
-        if (System.getProperty("os.name").indexOf("Mac") >= 0) {
-            openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.META_MASK));
-            openQueryMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_MASK));
-            saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.META_MASK));
-            exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.META_MASK));
-            execMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.META_MASK));
-            csMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.META_MASK));
+        if (System.getProperty("os.name").contains("Mac")) {
+            openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.META_DOWN_MASK));
+            openQueryMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_DOWN_MASK));
+            saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.META_DOWN_MASK));
+            exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.META_DOWN_MASK));
+            execMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.META_DOWN_MASK));
+            csMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.META_DOWN_MASK));
         }
         loadPrefs();
     }
@@ -222,12 +218,8 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                     script = parser.parse(query);
                     result = script.eval();
                 } catch (final Exception ex) {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            ErrorUtils.showDialog(ex, MediaMatrixDatabaseFrame.this);
-                        }
+                    SwingUtilities.invokeLater(() -> {
+                        ErrorUtils.showDialog(ex, MediaMatrixDatabaseFrame.this);
                     });
                     return null;
                 }
@@ -252,7 +244,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                             }
                         }
                     }
-                } catch (Exception ex) {
+                } catch (InterruptedException | ExecutionException ex) {
                     ErrorUtils.showDialog(ex, MediaMatrixDatabaseFrame.this);
                 }
             }
@@ -274,7 +266,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         final StringBuffer buff = new StringBuffer();
         final String[] dirs = explorer.getDatabase();
         for (int i = 0; i < dirs.length; i++) {
-            buff.append(dirs[i].toString());
+            buff.append(dirs[i]);
             if (i + 1 < dirs.length) {
                 buff.append(";");
             }
@@ -382,7 +374,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         fileMenu.setMnemonic('F');
         fileMenu.setText("File");
 
-        openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
+        openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         openMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Database.png"))); // NOI18N
         openMenuItem.setMnemonic('O');
         openMenuItem.setText("Open Data");
@@ -393,7 +385,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         });
         fileMenu.add(openMenuItem);
 
-        reindexMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK));
+        reindexMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         reindexMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Find.png"))); // NOI18N
         reindexMenuItem.setText("Delta Indexing");
         reindexMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -403,7 +395,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         });
         fileMenu.add(reindexMenuItem);
 
-        openQueryMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        openQueryMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         openQueryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Fileopen.png"))); // NOI18N
         openQueryMenuItem.setMnemonic('C');
         openQueryMenuItem.setText("Open CXMQL");
@@ -414,7 +406,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         });
         fileMenu.add(openQueryMenuItem);
 
-        saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         saveMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Filesave.png"))); // NOI18N
         saveMenuItem.setMnemonic('S');
         saveMenuItem.setText("Save CXMQL");
@@ -425,7 +417,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         });
         fileMenu.add(saveMenuItem);
 
-        exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         exitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Exit.png"))); // NOI18N
         exitMenuItem.setMnemonic('x');
         exitMenuItem.setText("Exit");
@@ -441,7 +433,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         toolMenu.setMnemonic('T');
         toolMenu.setText("Tool");
 
-        execMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
+        execMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         execMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Execute.png"))); // NOI18N
         execMenuItem.setMnemonic('E');
         execMenuItem.setText("Execute Query");
@@ -452,7 +444,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         });
         toolMenu.add(execMenuItem);
 
-        csMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK));
+        csMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         csMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Colortable.png"))); // NOI18N
         csMenuItem.setMnemonic('S');
         csMenuItem.setText("Color Scheme");
@@ -601,7 +593,7 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             final JButton button = new JButton("Show Variable:");
             button.setIcon(new ImageIcon(getClass().getResource("/mediamatrix/resources/Find.png")));
             button.setOpaque(false);
-            final List<String> vec = new ArrayList<String>();
+            final List<String> vec = new ArrayList<>();
             final Set<String> keys = vars.keySet();
             for (final Iterator<String> it = keys.iterator(); it.hasNext();) {
                 final String key = it.next();
@@ -609,22 +601,19 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                     vec.add(key);
                 }
             }
-            final JComboBox<String> box = new JComboBox<String>(vec.toArray(new String[vec.size()]));
+            final JComboBox<String> box = new JComboBox<>(vec.toArray(String[]::new));
             toolbar.add(button);
             toolbar.add(box);
             toolbar.setOpaque(false);
             add(new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
-            button.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (box.getSelectedIndex() > -1) {
-                        final String key = (String) box.getSelectedItem();
-                        final Object obj = vars.get(key);
-                        if (obj instanceof MediaMatrix) {
-                            DialogUtils.showDialog(key, new MediaMatrixSplineGraphPanel((MediaMatrix) obj), QueryResultPanel.this);
-                        } else if (obj instanceof CorrelationMatrix) {
-                            DialogUtils.showDialog(key, new CorrelationMatrixPanel((CorrelationMatrix) obj), QueryResultPanel.this);
+            button.addActionListener((ActionEvent e) -> {
+                if (box.getSelectedIndex() > -1) {
+                    final String key = (String) box.getSelectedItem();
+                    final Object obj = vars.get(key);
+                    switch (obj) {
+                        case MediaMatrix mediaMatrix -> DialogUtils.showDialog(key, new MediaMatrixSplineGraphPanel(mediaMatrix), QueryResultPanel.this);
+                        case CorrelationMatrix correlationMatrix -> DialogUtils.showDialog(key, new CorrelationMatrixPanel(correlationMatrix), QueryResultPanel.this);
+                        default -> {
                         }
                     }
                 }
@@ -666,16 +655,12 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                         final CXMQLVisualizeScript scriptObject = parser.parse(scriptString);
                         if (scriptObject.getType().equalsIgnoreCase("VIDEO")) {
                             final JMenuItem item = new JMenuItem(name);
-                            item.addActionListener(new ActionListener() {
-
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    int rows[] = getSelectedRows();
-                                    if (rows.length > 0) {
-                                        final File file = model.getAsFile(rows[0]);
-                                        final String query = scriptString.replace("$FILE", file.getAbsolutePath());
-                                        executeVisualizeScript(query);
-                                    }
+                            item.addActionListener((ActionEvent e) -> {
+                                int rows[] = getSelectedRows();
+                                if (rows.length > 0) {
+                                    final File file1 = model.getAsFile(rows[0]);
+                                    final String query = scriptString.replace("$FILE", file1.getAbsolutePath());
+                                    executeVisualizeScript(query);
                                 }
                             });
                             script.add(item);
@@ -747,16 +732,12 @@ public class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                         final CXMQLVisualizeScript scriptObject = parser.parse(scriptString);
                         if (scriptObject.getType().equalsIgnoreCase("MUSIC")) {
                             final JMenuItem item = new JMenuItem(name);
-                            item.addActionListener(new ActionListener() {
-
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    int rows[] = getSelectedRows();
-                                    if (rows.length > 0) {
-                                        final File file = model.getAsFile(rows[0]);
-                                        final String query = scriptString.replace("$FILE", file.getAbsolutePath());
-                                        executeVisualizeScript(query);
-                                    }
+                            item.addActionListener((ActionEvent e) -> {
+                                int rows[] = getSelectedRows();
+                                if (rows.length > 0) {
+                                    final File file1 = model.getAsFile(rows[0]);
+                                    final String query = scriptString.replace("$FILE", file1.getAbsolutePath());
+                                    executeVisualizeScript(query);
                                 }
                             });
                             script.add(item);

@@ -89,7 +89,7 @@ public class CXMQLReIndexScript extends CXMQLScript {
         }
 
         final ExecutorService executor = Executors.newFixedThreadPool(2);
-        final Set<MediaDataObjectScore> result = new TreeSet<MediaDataObjectScore>();
+        final TreeSet<MediaDataObjectScore> result = new TreeSet<MediaDataObjectScore>();
         final List<Future<MediaDataObjectScore>> futures = new ArrayList<Future<MediaDataObjectScore>>();
 
         for (int i = 0; i < files.length; i++) {
@@ -111,8 +111,7 @@ public class CXMQLReIndexScript extends CXMQLScript {
                     carc.setColorImpressionKnowledge(ci);
                     carc.setMatrix(mat);
                     carc.update();
-                    final MediaDataObjectScore score = new MediaDataObjectScore(new MediaDataObject(files[index].getAbsolutePath()), 0d);
-                    return score;
+                    return new MediaDataObjectScore(new MediaDataObject(files[index].getAbsolutePath()), 0d);
                 }
             }));
         }

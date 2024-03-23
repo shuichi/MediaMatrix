@@ -2,6 +2,7 @@ package mediamatrix.gui;
 
 import mediamatrix.db.FileOpenScriptGenerator;
 import mediamatrix.utils.FileNameUtilities;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -20,12 +22,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+
 import mediamatrix.utils.IOUtilities;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
 
-public class ExplorerPanel extends JScrollPane {
+public final class ExplorerPanel extends JScrollPane {
 
+    @Serial
     private static final long serialVersionUID = -4063699836849593357L;
     private final JPopupMenu dbPopup = new JPopupMenu("File List");
     private final JMenuItem deleteItem = new JMenuItem("Delete");

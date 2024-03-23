@@ -1,12 +1,13 @@
 package mediamatrix.gui;
 
-import mediamatrix.gui.ErrorUtils;
 import mediamatrix.mvc.MediaMatrixXYDataSetAdapter;
 import mediamatrix.db.MediaMatrix;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.io.Serial;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,22 +23,24 @@ import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.ui.RectangleInsets;
 
-public class MediaMatrixSplineGraphPanel extends JPanel {
+public final class MediaMatrixSplineGraphPanel extends JPanel {
 
+    @Serial
     private static final long serialVersionUID = -9129290602166654043L;
-    private JTabbedPane aTabbedPane;
-    private JToolBar aToolBar;
-    private JScrollPane chartScrollPane;
-    private JCheckBox scrollCheckBox;
+
+    private final JTabbedPane aTabbedPane;
+    private final JToolBar aToolBar;
+    private final JScrollPane chartScrollPane;
+    private final JCheckBox scrollCheckBox;
     private JCheckBox bgCheckBox;
-    private JLabel segmentLabel;
-    private JToolBar.Separator separator1;
-    private ChartPanel chartPanel = new ChartPanel(null);
-    private MediaMatrixPanel matrixPanel;
-    private XYSplineRenderer renderer = new XYSplineRenderer();
-    private NumberAxis xAxis = new NumberAxis("Time");
-    private NumberAxis yAxis = new NumberAxis("Score");
-    private MediaMatrix mat;
+    private final JLabel segmentLabel;
+    private final JToolBar.Separator separator1;
+    private final ChartPanel chartPanel = new ChartPanel(null);
+    private final MediaMatrixPanel matrixPanel;
+    private final XYSplineRenderer renderer = new XYSplineRenderer();
+    private final NumberAxis xAxis = new NumberAxis("Time");
+    private final NumberAxis yAxis = new NumberAxis("Score");
+    private final MediaMatrix mat;
     private Color bgColor = Color.lightGray;
 
     public MediaMatrixSplineGraphPanel(MediaMatrix mat) {
@@ -58,28 +61,20 @@ public class MediaMatrixSplineGraphPanel extends JPanel {
         aToolBar.add(separator1);
         bgCheckBox.setText("Background Color");
         bgCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        bgCheckBox.addActionListener(new java.awt.event.ActionListener() {
-
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                if (bgCheckBox.isSelected()) {
-                    bgColor = Color.lightGray;
-                } else {
-                    bgColor = Color.white;
-                }
-                redraw();
+        bgCheckBox.addActionListener((java.awt.event.ActionEvent evt) -> {
+            if (bgCheckBox.isSelected()) {
+                bgColor = Color.lightGray;
+            } else {
+                bgColor = Color.white;
             }
+            redraw();
         });
 
         scrollCheckBox.setText("Scroll");
         scrollCheckBox.setFocusable(false);
         scrollCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        scrollCheckBox.addActionListener(new java.awt.event.ActionListener() {
-
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                redraw();
-            }
+        scrollCheckBox.addActionListener((java.awt.event.ActionEvent evt) -> {
+            redraw();
         });
         aToolBar.add(scrollCheckBox);
         aToolBar.add(bgCheckBox);
@@ -136,7 +131,7 @@ public class MediaMatrixSplineGraphPanel extends JPanel {
                     chartPanel.setRangeZoomable(true);
                     chartScrollPane.setViewportView(chartPanel);
                     repaint();
-                } catch (Exception ex) {
+                } catch (InterruptedException | ExecutionException ex) {
                     ErrorUtils.showDialog(ex, MediaMatrixSplineGraphPanel.this);
                 }
             }

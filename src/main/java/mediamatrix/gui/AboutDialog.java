@@ -19,7 +19,7 @@ package mediamatrix.gui;
 import java.io.File;
 import javax.swing.JDialog;
 
-public class AboutDialog extends javax.swing.JDialog {
+public final class AboutDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 1L;
 

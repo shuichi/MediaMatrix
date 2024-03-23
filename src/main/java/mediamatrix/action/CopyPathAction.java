@@ -20,6 +20,7 @@ public class CopyPathAction extends AbstractAction {
         this.table = table;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         final int rows[] = table.getSelectedRows();
         final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

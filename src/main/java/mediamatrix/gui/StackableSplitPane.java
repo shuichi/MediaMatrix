@@ -1,6 +1,7 @@
 package mediamatrix.gui;
 
 import java.awt.Component;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -8,8 +9,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSplitPane;
 
-public class StackableSplitPane extends JSplitPane {
+public final class StackableSplitPane extends JSplitPane {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public StackableSplitPane() {
@@ -55,14 +57,14 @@ public class StackableSplitPane extends JSplitPane {
     }
 
     public JComponent[] getManagedComponents() {
-        return getResursivelyComponents(this, new ArrayList<JComponent>());
+        return getResursivelyComponents(this, new ArrayList<>());
     }
 
     private JSplitPane findComponent(JSplitPane pane, JComponent comp) {
         if (pane.getLeftComponent() == comp) {
             return pane;
-        } else if (pane.getRightComponent() instanceof JSplitPane) {
-            return findComponent((JSplitPane) pane.getRightComponent(), comp);
+        } else if (pane.getRightComponent() instanceof JSplitPane jSplitPane) {
+            return findComponent(jSplitPane, comp);
         }
         return null;
     }
@@ -73,15 +75,15 @@ public class StackableSplitPane extends JSplitPane {
             return parentPane;
         } else if (parentPane == pane) {
             return pane;
-        } else if (next instanceof JSplitPane) {
-            return findParentColumn((JSplitPane) next, pane);
+        } else if (next instanceof JSplitPane jSplitPane) {
+            return findParentColumn(jSplitPane, pane);
         }
         return null;
     }
 
     private JSplitPane findEmptyPane(JSplitPane pane) {
-        if (pane.getRightComponent() instanceof JSplitPane) {
-            return findEmptyPane((JSplitPane) pane.getRightComponent());
+        if (pane.getRightComponent() instanceof JSplitPane jSplitPane) {
+            return findEmptyPane(jSplitPane);
         } else {
             return pane;
         }
@@ -92,10 +94,10 @@ public class StackableSplitPane extends JSplitPane {
         if (comp != null) {
             list.add(comp);
         }
-        if (pane.getRightComponent() instanceof JSplitPane) {
-            return getResursivelyComponents((JSplitPane) pane.getRightComponent(), list);
+        if (pane.getRightComponent() instanceof JSplitPane jSplitPane) {
+            return getResursivelyComponents(jSplitPane, list);
         } else {
-            return list.toArray(new JComponent[list.size()]);
+            return list.toArray(JComponent[]::new);
         }
     }
 }

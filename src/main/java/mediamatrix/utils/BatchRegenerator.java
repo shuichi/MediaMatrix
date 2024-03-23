@@ -9,10 +9,10 @@ public class BatchRegenerator {
     public static void main(String[] args) throws Exception {
         File dir = new File("C:/WORKSPACE");
         File[] files = dir.listFiles(new ChronoArchiveFileFilter());
-        for (int i = 0; i < files.length; i++) {
-            System.out.println("CARC : " + files[i].getName());
-            final File outfile = new File(files[i].getParentFile(), files[i].getName().substring(0, files[i].getName().lastIndexOf('.')) + ".flv");
-            final ChronoArchive carc = new ChronoArchive(files[i]);
+        for (File file : files) {
+            System.out.println("CARC : " + file.getName());
+            final File outfile = new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf('.')) + ".flv");
+            final ChronoArchive carc = new ChronoArchive(file);
             carc.getMainContent().renameTo(outfile);
             carc.close();
         }

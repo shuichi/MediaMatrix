@@ -19,6 +19,7 @@ package mediamatrix.music;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Note implements Serializable {
 
@@ -114,6 +115,6 @@ public class Note implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + new BigDecimal(startTime).setScale(0, BigDecimal.ROUND_HALF_UP) + "] Note " + getPitchName() + " velocity: " + velocity + " duration: " + length;
+        return "[" + new BigDecimal(startTime).setScale(0, RoundingMode.HALF_UP) + "] Note " + getPitchName() + " velocity: " + velocity + " duration: " + length;
     }
 }

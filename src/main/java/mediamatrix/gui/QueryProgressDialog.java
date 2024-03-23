@@ -3,11 +3,14 @@ package mediamatrix.gui;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import javax.swing.SwingUtilities;
 
-public class QueryProgressDialog extends javax.swing.JDialog implements PropertyChangeListener {
+public final class QueryProgressDialog extends javax.swing.JDialog implements PropertyChangeListener {
 
+    @Serial
     private static final long serialVersionUID = 1L;
+    
     private long start;
 
     public QueryProgressDialog(Window frame) {
@@ -29,19 +32,15 @@ public class QueryProgressDialog extends javax.swing.JDialog implements Property
                 }
                 repaint();
             } else {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        setTitle("Preparing Result Browser");
-                        aProgressBar.setValue(0);
-                        aProgressBar.setIndeterminate(true);
-                        timeLabel.setText("");
-                        if (!isVisible()) {
-                            setVisible(true);
-                        }
-                        repaint();
+                SwingUtilities.invokeLater(() -> {
+                    setTitle("Preparing Result Browser");
+                    aProgressBar.setValue(0);
+                    aProgressBar.setIndeterminate(true);
+                    timeLabel.setText("");
+                    if (!isVisible()) {
+                        setVisible(true);
                     }
+                    repaint();
                 });
             }
         }
@@ -51,36 +50,30 @@ public class QueryProgressDialog extends javax.swing.JDialog implements Property
                 setVisible(false);
                 dispose();
             } else {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        setVisible(false);
-                        dispose();
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    setVisible(false);
+                    dispose();
                 });
             }
         }
 
-        if ("progress".equals(strPropertyName)) {
-            if (SwingUtilities.isEventDispatchThread()) {
-                if (!isVisible()) {
-                    setVisible(true);
-                }
-                aProgressBar.setIndeterminate(false);
-                int progress = (Integer) evt.getNewValue();
-                aProgressBar.setValue(progress);
-                if (progress >= 100) {
-                    setVisible(false);
+        if (null != strPropertyName) switch (strPropertyName) {
+            case "progress" -> {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    if (!isVisible()) {
+                        setVisible(true);
+                    }
+                    aProgressBar.setIndeterminate(false);
+                    int progress = (Integer) evt.getNewValue();
+                    aProgressBar.setValue(progress);
+                    if (progress >= 100) {
+                        setVisible(false);
+                    } else {
+                        timeLabel.setText("Elapsed Time:" + ((System.currentTimeMillis() - start) / 1000));
+                        repaint();
+                    }
                 } else {
-                    timeLabel.setText("Elapsed Time:" + ((System.currentTimeMillis() - start) / 1000));
-                    repaint();
-                }
-            } else {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
+                    SwingUtilities.invokeLater(() -> {
                         if (!isVisible()) {
                             setVisible(true);
                         }
@@ -93,60 +86,52 @@ public class QueryProgressDialog extends javax.swing.JDialog implements Property
                             timeLabel.setText("Elapsed Time:" + ((System.currentTimeMillis() - start) / 1000));
                             repaint();
                         }
-                    }
-                });
-            }
-        } else if ("file".equals(strPropertyName)) {
-            if (SwingUtilities.isEventDispatchThread()) {
-                if (!isVisible()) {
-                    setVisible(true);
+                    });
                 }
-                aProgressBar.setIndeterminate(true);
-                setTitle("Processing: " + evt.getNewValue());
-            } else {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
+            }
+            case "file" -> {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    if (!isVisible()) {
+                        setVisible(true);
+                    }
+                    aProgressBar.setIndeterminate(true);
+                    setTitle("Processing: " + evt.getNewValue());
+                } else {
+                    SwingUtilities.invokeLater(() -> {
                         if (!isVisible()) {
                             setVisible(true);
                         }
                         setTitle("Processing: " + evt.getNewValue());
                         aProgressBar.setIndeterminate(true);
-                    }
-                });
+                    });
+                }
             }
-        } else if ("exception".equals(strPropertyName)) {
-            if (SwingUtilities.isEventDispatchThread()) {
-                setVisible(false);
-                dispose();
-            } else {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
+            case "exception" -> {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    setVisible(false);
+                    dispose();
+                } else {
+                    SwingUtilities.invokeLater(() -> {
                         setVisible(false);
                         dispose();
-                    }
-                });
+                    });
+                }
+            }
+            default -> {
             }
         }
     }
 
     public void init(final int max) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                aProgressBar.setIndeterminate(false);
-                aProgressBar.setMinimum(0);
-                aProgressBar.setMaximum(max);
-                aProgressBar.setValue(0);
-                start = System.currentTimeMillis();
-                setLocationRelativeTo(null);
-                pack();
-                setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            aProgressBar.setIndeterminate(false);
+            aProgressBar.setMinimum(0);
+            aProgressBar.setMaximum(max);
+            aProgressBar.setValue(0);
+            start = System.currentTimeMillis();
+            setLocationRelativeTo(null);
+            pack();
+            setVisible(true);
         });
 
     }

@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -17,11 +18,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class ColorSchemeSelectionPanel extends javax.swing.JPanel {
+@SuppressWarnings("serial")
+public final class ColorSchemeSelectionPanel extends javax.swing.JPanel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private List<JCheckBox> checkBoxList;
-    private ColorImpressionKnowledge ci;
+    private transient List<JCheckBox> checkBoxList;
+    private transient ColorImpressionKnowledge ci;
 
     public ColorSchemeSelectionPanel() {
         initComponents();
@@ -32,10 +35,9 @@ public class ColorSchemeSelectionPanel extends javax.swing.JPanel {
         final String[] words = ci.getWords();
         mainPanel.setVisible(false);
         mainPanel.removeAll();
-        checkBoxList = new ArrayList<JCheckBox>();
+        checkBoxList = new ArrayList<>();
         mainPanel.setLayout(new java.awt.GridLayout(words.length, 2));
-        for (int i = 0; i < words.length; i++) {
-            final String colorSchemeName = words[i];
+        for (final String colorSchemeName : words) {
             final JPanel panel = new JPanel(true);
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             final JLabel label = new JLabel();
@@ -60,7 +62,7 @@ public class ColorSchemeSelectionPanel extends javax.swing.JPanel {
 
     public List<String> getSelectedWords() {
         final String[] words = ci.getWords();
-        final List<String> result = new ArrayList<String>();
+        final ArrayList<String> result = new ArrayList<>();
         for (int i = 0; i < checkBoxList.size(); i++) {
             if (checkBoxList.get(i).isSelected()) {
                 result.add(words[i]);
@@ -71,23 +73,19 @@ public class ColorSchemeSelectionPanel extends javax.swing.JPanel {
 
     private void updateSelection() {
         final String[] words = ci.getWords();
-        final List<String> result = new ArrayList<String>();
+        final ArrayList<String> result = new ArrayList<>();
         for (int i = 0; i < checkBoxList.size(); i++) {
             if (checkBoxList.get(i).isSelected()) {
                 result.add(words[i]);
             }
         }
         final PropertyChangeListener[] listeners = getPropertyChangeListeners("colorschema");
-        for (int i = 0; i < listeners.length; i++) {
-            listeners[i].propertyChange(new PropertyChangeEvent(this, "colorschema", null, result));
+        for (PropertyChangeListener listener : listeners) {
+            listener.propertyChange(new PropertyChangeEvent(this, "colorschema", null, result));
         }
     }
-    private final ActionListener checkBoxListener = new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            updateSelection();
-        }
+    private final ActionListener checkBoxListener = (ActionEvent e) -> {
+        updateSelection();
     };
 
     /** This method is called from within the constructor to

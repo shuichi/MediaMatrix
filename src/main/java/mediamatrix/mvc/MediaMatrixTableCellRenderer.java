@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-public class MediaMatrixTableCellRenderer extends JLabel implements TableCellRenderer {
+public final class MediaMatrixTableCellRenderer extends JLabel implements TableCellRenderer {
 
     private static final long serialVersionUID = 1L;
 

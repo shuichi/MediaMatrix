@@ -20,12 +20,13 @@ public class CopyAsOpenAction extends AbstractAction {
         this.table = table;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         final int rows[] = table.getSelectedRows();
         final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         final StringBuffer buff = new StringBuffer();
         for (int i = 0; i < rows.length; i++) {
-            buff.append("open(\"" + model.getAsFile(rows[i]).getAbsolutePath() + "\") -> MAT" + (i + 1));
+            buff.append("open(\"").append(model.getAsFile(rows[i]).getAbsolutePath()).append("\") -> MAT").append(i).append(1);
             buff.append("\n");
         }
         final StringSelection selection = new StringSelection(buff.toString());

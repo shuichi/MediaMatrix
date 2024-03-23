@@ -10,7 +10,7 @@ import javax.swing.ListCellRenderer;
 import mediamatrix.db.CorrelationScore;
 import mediamatrix.munsell.ColorImpressionKnowledge;
 
-public class ImpressionWordListCellRenderer extends JLabel implements ListCellRenderer<CorrelationScore> {
+public final class ImpressionWordListCellRenderer extends JLabel implements ListCellRenderer<CorrelationScore> {
 
     private static final long serialVersionUID = 1L;
     private final ColorImpressionKnowledge ci;

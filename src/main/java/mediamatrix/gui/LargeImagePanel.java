@@ -13,16 +13,18 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.Serial;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 
-public class LargeImagePanel extends javax.swing.JPanel {
+public final class LargeImagePanel extends javax.swing.JPanel {
 
-    public static final long serialVersionUID = 1L;
-    private BufferedImage image;
-    private BufferedImage viewImage;
-    private JComponent comp;
-    protected Point previous;
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private transient BufferedImage image;
+    private transient BufferedImage viewImage;
+    private transient JComponent comp;
+    private Point previous;
 
     public LargeImagePanel(BufferedImage img) {
         initComponents();

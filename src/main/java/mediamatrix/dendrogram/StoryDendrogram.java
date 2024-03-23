@@ -1,5 +1,6 @@
 package mediamatrix.dendrogram;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,23 +11,24 @@ import java.util.TreeSet;
 
 public class StoryDendrogram implements Serializable {
 
-    public static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Node node;
-    private final List<Node> leaves;
+    private final ArrayList<Node> leaves;
 
-    public StoryDendrogram(List<Node> items) {
+    public StoryDendrogram(ArrayList<Node> items) {
         this.leaves = items;
     }
 
     public Node getRootNode() {
         if (node == null) {
-            node = dendrogram(leaves, new TreeMap<String, Double>());
+            node = dendrogram(leaves, new TreeMap<>());
         }
         return node;
     }
 
     public Node findParentOf(Node n) {
-        List<Node> allNodes = traverse(new ArrayList<Node>(), getRootNode());
+        List<Node> allNodes = traverse(new ArrayList<>(), getRootNode());
         for (Node target : allNodes) {
             if (!target.isLeaf()) {
                 if (target.getRight() == n || target.getLeft() == n) {
@@ -48,7 +50,7 @@ public class StoryDendrogram implements Serializable {
 
     private Node dendrogram(List<Node> leaves, Map<String, Double> cache) {
         if (leaves.size() > 1) {
-            final Set<NodeRelevance> delimiters = new TreeSet<NodeRelevance>();
+            final Set<NodeRelevance> delimiters = new TreeSet<>();
             Node previous = null;
             for (int i = 0; i < leaves.size(); i++) {
                 if (i > 0) {
@@ -65,7 +67,7 @@ public class StoryDendrogram implements Serializable {
                 previous = leaves.get(i);
             }
             final Node tempNode = delimiters.iterator().next().toNode();
-            final List<Node> result = new ArrayList<Node>();
+            final List<Node> result = new ArrayList<>();
             for (int i = 0; i < leaves.size(); i++) {
                 if (leaves.get(i) == tempNode.getLeft() && leaves.get(i + 1) == tempNode.getRight()) {
                     i++;

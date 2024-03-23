@@ -4,46 +4,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CSV {
-    
+
     public static final char DEFAULT_SEP = ',';
     protected char fieldSep;
-    protected List<String> list = new ArrayList<String>();
-    
+    protected List<String> list = new ArrayList<>();
 
     public CSV() {
         this(DEFAULT_SEP);
     }
 
-    
     public CSV(char sep) {
         fieldSep = sep;
     }
-    
-    
+
     public List<String> parse(String line) {
         StringBuffer sb = new StringBuffer();
         list.clear(); // discard previous, if any
         int i = 0;
-        
+
         if (line.length() == 0) {
             list.add(line);
             return list;
         }
-        
+
         do {
             sb.setLength(0);
-            if (i < line.length() && line.charAt(i) == '"')
+            if (i < line.length() && line.charAt(i) == '"') {
                 i = advQuoted(line, sb, ++i); // skip quote
-            else
+            } else {
                 i = advPlain(line, sb, i);
+            }
             list.add(sb.toString());
             i++;
         } while (i < line.length());
-        
+
         return list;
     }
-    
-    /** advQuoted: quoted field; return index of next separator */
+
+    /**
+     * advQuoted: quoted field; return index of next separator
+     */
     protected int advQuoted(String s, StringBuffer sb, int i) {
         int j;
         int len = s.length();
@@ -63,11 +63,17 @@ public class CSV {
         }
         return j;
     }
-    
-    /** advPlain: unquoted field; return index of next separator */
+
+    /**
+     * advPlain: unquoted field; return index of next separator
+     * @param s
+     * @param sb
+     * @param i
+     * @return 
+     */
     protected int advPlain(String s, StringBuffer sb, int i) {
         int j;
-        
+
         j = s.indexOf(fieldSep, i); // look for separator
         if (j == -1) { // none found
             sb.append(s.substring(i));

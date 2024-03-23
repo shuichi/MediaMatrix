@@ -19,17 +19,15 @@ package mediamatrix.db;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
-public class MediaMatrix {
+public class MediaMatrix implements Serializable {
 
     private static final long serialVersionUID = 7505454054798245286L;
-    private Map<Double, Integer> rowIndex;
-    private Map<String, Integer> columnIndex;
+    private TreeMap<Double, Integer> rowIndex;
+    private TreeMap<String, Integer> columnIndex;
     private double[] row;
     private String[] column;
     private float[][] values;
@@ -43,8 +41,8 @@ public class MediaMatrix {
     public MediaMatrix(double[] row, String[] column) {
         this.row = row;
         this.column = column;
-        this.columnIndex = new TreeMap<String, Integer>();
-        this.rowIndex = new TreeMap<Double, Integer>();
+        this.columnIndex = new TreeMap<>();
+        this.rowIndex = new TreeMap<>();
         for (int i = 0; i < column.length; i++) {
             columnIndex.put(column[i], i);
         }
@@ -74,8 +72,8 @@ public class MediaMatrix {
         System.arraycopy(column, 0, newColumn, 0, column.length);
         newColumn[newColumn.length - 1] = name;
         this.column = newColumn;
-        this.columnIndex = new TreeMap<String, Integer>();
-        this.rowIndex = new TreeMap<Double, Integer>();
+        this.columnIndex = new TreeMap<>();
+        this.rowIndex = new TreeMap<>();
         for (int i = 0; i < column.length; i++) {
             columnIndex.put(column[i], i);
         }
@@ -146,8 +144,8 @@ public class MediaMatrix {
         for (int i = 0; i < column.length; i++) {
             column[i] = in.readUTF();
         }
-        columnIndex = new TreeMap<String, Integer>();
-        rowIndex = new TreeMap<Double, Integer>();
+        columnIndex = new TreeMap<>();
+        rowIndex = new TreeMap<>();
         for (int i = 0; i < column.length; i++) {
             columnIndex.put(column[i], i);
         }

@@ -12,7 +12,7 @@ import java.util.Properties;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
-public class PropertiesTableModel extends AbstractTableModel {
+public final class PropertiesTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
     private final static Class<?>[] RETURN_TYPES = {Boolean.TYPE, Boolean.class, Integer.TYPE, Integer.class, String.class, InetAddress.class};
@@ -34,10 +34,11 @@ public class PropertiesTableModel extends AbstractTableModel {
 
     /**
      * Create this <code>TableModel</code>.
+     * @param prop
      */
     public PropertiesTableModel(Properties prop) {
         mTableProp = prop;
-        mTableKeys = new Vector<String>();
+        mTableKeys = new Vector<>();
         initializeTable();
         isReadOnly = false;
     }
@@ -81,6 +82,7 @@ public class PropertiesTableModel extends AbstractTableModel {
 
     /**
      * Get column name.
+     * @param index
      */
     @Override
     public String getColumnName(int index) {

@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 public class CorrelationScoreTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
-    private final List<CorrelationScore> scores;
+    private transient final List<CorrelationScore> scores;
 
     public CorrelationScoreTableModel(List<CorrelationScore> scores) {
         this.scores = scores;

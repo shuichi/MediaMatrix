@@ -16,37 +16,39 @@ public class ClassPathSearcher implements DynamicModuleLoader {
 
     private final String[] suffixes;
     private final Class<?>[] baseClasses;
-    private Set<Class<?>> pluginClasses;
+    private final Set<Class<?>> pluginClasses;
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     public ClassPathSearcher(String[] suffixes, Class<?>[] baseClasses) throws IOException {
         this.suffixes = suffixes;
         this.baseClasses = baseClasses;
-        this.pluginClasses = new HashSet<Class<?>>();
+        this.pluginClasses = new HashSet<>();
         searchClassPath();
     }
 
+    @Override
     public Class<?>[] getPlugins() {
-        return pluginClasses.toArray(new Class<?>[pluginClasses.size()]);
+        return pluginClasses.toArray(Class<?>[]::new);
     }
 
+    @Override
     public Class<?>[] getPlugins(Class<?> baseClass) {
-        final List<Class<?>> list = new ArrayList<Class<?>>();
+        final List<Class<?>> list = new ArrayList<>();
         for (Class<?> clazz : pluginClasses) {
             if (ClassUtilities.isSubclassOf(clazz, baseClass)) {
                 list.add(clazz);
             }
         }
-        return list.toArray(new Class<?>[list.size()]);
+        return list.toArray(Class<?>[]::new);
     }
 
     private void searchClassPath() throws IOException {
         String line = System.getProperty("java.class.path");
         String items[] = line.split(System.getProperty("path.separator"));
-        for (int i = 0; i < items.length; i++) {
-            File file = new File(items[i]);
+        for (String item : items) {
+            File file = new File(item);
             if (file.isDirectory()) {
-                recursiveDirectory(items[i], file);
+                recursiveDirectory(item, file);
             }
             if (file.toString().endsWith(".jar")) {
                 searchJar(file);
@@ -56,9 +58,9 @@ public class ClassPathSearcher implements DynamicModuleLoader {
 
     private void recursiveDirectory(String classpath, File dir) {
         final File[] contents = dir.listFiles();
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i].toString().endsWith(".class")) {
-                final String className = ClassUtilities.pathToFullyQualifiedName(classpath, contents[i].toString());
+        for (File content : contents) {
+            if (content.toString().endsWith(".class")) {
+                final String className = ClassUtilities.pathToFullyQualifiedName(classpath, content.toString());
                 if (hasTargetSuffix(className)) {
                     try {
                         final Class<?> clazz = Class.forName(className);
@@ -70,8 +72,8 @@ public class ClassPathSearcher implements DynamicModuleLoader {
                     }
                 }
             }
-            if (contents[i].isDirectory()) {
-                recursiveDirectory(classpath, contents[i]);
+            if (content.isDirectory()) {
+                recursiveDirectory(classpath, content);
             }
         }
     }
@@ -98,8 +100,8 @@ public class ClassPathSearcher implements DynamicModuleLoader {
     }
 
     private boolean hasTargetSuffix(String className) {
-        for (int i = 0; i < suffixes.length; i++) {
-            if (className.endsWith(suffixes[i])) {
+        for (String suffixe : suffixes) {
+            if (className.endsWith(suffixe)) {
                 return true;
             }
         }
@@ -107,8 +109,8 @@ public class ClassPathSearcher implements DynamicModuleLoader {
     }
 
     private boolean isPluginClass(Class<?> targetClass) {
-        for (int i = 0; i < baseClasses.length; i++) {
-            if (ClassUtilities.isSubclassOf(targetClass, baseClasses[i])) {
+        for (Class<?> baseClasse : baseClasses) {
+            if (ClassUtilities.isSubclassOf(targetClass, baseClasse)) {
                 return true;
             }
         }

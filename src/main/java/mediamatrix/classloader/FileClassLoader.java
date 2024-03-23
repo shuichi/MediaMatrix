@@ -5,15 +5,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class FileClassLoader extends ClassLoader {
+public final class FileClassLoader extends ClassLoader {
 
-    private HashMap<String, Class<?>> cache = new HashMap<String, Class<?>>();
+    private final HashMap<String, Class<?>> cache = new HashMap<>();
     private File[] jarFiles;
 
     public FileClassLoader() {
@@ -31,9 +32,9 @@ public class FileClassLoader extends ClassLoader {
 
     @Override
     public URL getResource(String name) {
-        for (int i = 0; i < jarFiles.length; i++) {
-            if (jarFiles[i] != null) {
-                URL url = loadResourceFromJarFile(jarFiles[i], name);
+        for (File jarFile : jarFiles) {
+            if (jarFile != null) {
+                URL url = loadResourceFromJarFile(jarFile, name);
                 if (url != null) {
                     return url;
                 }
@@ -45,9 +46,9 @@ public class FileClassLoader extends ClassLoader {
 
     @Override
     public InputStream getResourceAsStream(String name) {
-        for (int i = 0; i < jarFiles.length; i++) {
-            if (jarFiles[i] != null) {
-                InputStream in = loadStreamFromJarFile(jarFiles[i], name);
+        for (File jarFile : jarFiles) {
+            if (jarFile != null) {
+                InputStream in = loadStreamFromJarFile(jarFile, name);
                 if (in != null) {
                     return in;
                 }
@@ -79,7 +80,7 @@ public class FileClassLoader extends ClassLoader {
                     is.close();
                     break;
                 }
-            } catch (Throwable t) {
+            } catch (IOException t) {
                 throw new IllegalArgumentException("Cannot read JAR file " + jars[i]);
             } finally {
                 if (jarFile != null) {
@@ -95,12 +96,12 @@ public class FileClassLoader extends ClassLoader {
 
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class<?> theClass = null;
+        Class<?> theClass;
         theClass = cache.get(name);
 
         if (theClass == null) {
-            for (int i = 0; i < jarFiles.length; i++) {
-                theClass = loadClassFromJarFile(jarFiles[i], name);
+            for (File jarFile : jarFiles) {
+                theClass = loadClassFromJarFile(jarFile, name);
                 if (theClass != null) {
                     break;
                 }
@@ -139,23 +140,21 @@ public class FileClassLoader extends ClassLoader {
     private Class<?> loadClassFromJarFile(File jar, String name) {
         final String filename = name.replace('.', '/') + ".class";
         ZipFile jarFile = null;
-        ZipEntry jarEntry = null;
+        ZipEntry jarEntry;
         Class<?> theClass = null;
         InputStream is = null;
 
         try {
             jarFile = new ZipFile(jar);
-            if (jarFile != null) {
-                jarEntry = jarFile.getEntry(filename);
-                if (jarEntry != null) {
-                    byte[] buffer = new byte[(int) jarEntry.getSize()];
-                    is = new BufferedInputStream(jarFile.getInputStream(jarEntry));
-                    is.read(buffer);
-                    theClass = defineClass(name, buffer, 0, buffer.length);
-                }
+            jarEntry = jarFile.getEntry(filename);
+            if (jarEntry != null) {
+                byte[] buffer = new byte[(int) jarEntry.getSize()];
+                is = new BufferedInputStream(jarFile.getInputStream(jarEntry));
+                is.read(buffer);
+                theClass = defineClass(name, buffer, 0, buffer.length);
             }
         } catch (IOException e) {
-            
+
         } finally {
             if (is != null) {
                 try {
@@ -178,8 +177,7 @@ public class FileClassLoader extends ClassLoader {
         String filename = name;
 
         ZipFile jarFile = null;
-        ZipEntry jarEntry = null;
-        InputStream is = null;
+        ZipEntry jarEntry;
         URL url = null;
 
         try {
@@ -187,7 +185,7 @@ public class FileClassLoader extends ClassLoader {
             jarEntry = jarFile.getEntry(filename);
             if (jarEntry != null) {
                 try {
-                    url = new URL("jar:file:" + jar.getAbsolutePath() + "!/" + name);
+                    url = URI.create("jar:file:" + jar.getAbsolutePath() + "!/" + name).toURL();
                 } catch (MalformedURLException e) {
                 }
             }
@@ -207,7 +205,7 @@ public class FileClassLoader extends ClassLoader {
     private InputStream loadStreamFromJarFile(File jar, String name) {
         String filename = name;
         ZipFile jarFile = null;
-        ZipEntry jarEntry = null;
+        ZipEntry jarEntry;
         InputStream is = null;
         try {
             jarFile = new ZipFile(jar);

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,7 +20,6 @@ public class CXMQLQueryScript extends CXMQLScript {
     private final PrimitiveEngine pe;
     private int previous;
 
-    @SuppressWarnings("unchecked")
     public CXMQLQueryScript() {
         super();
         context = new CXMQLContext();
@@ -73,8 +71,8 @@ public class CXMQLQueryScript extends CXMQLScript {
             worker = Integer.parseInt(pe.getProperty(CXMQLParameterNames.WORKER));
         }
         final ExecutorService executor = Executors.newFixedThreadPool(worker);
-        final Set<MediaDataObjectScore> result = new TreeSet<MediaDataObjectScore>();
-        final List<Future<MediaDataObjectScore>> futures = new ArrayList<Future<MediaDataObjectScore>>();
+        final TreeSet<MediaDataObjectScore> result = new TreeSet<>();
+        final List<Future<MediaDataObjectScore>> futures = new ArrayList<>();
         queryBy.eval(context);
         from.prepare();
 
@@ -82,25 +80,21 @@ public class CXMQLQueryScript extends CXMQLScript {
 
         for (int i = 0; i < from.size(); i++) {
             final int index = i;
-            futures.add(executor.submit(new Callable<MediaDataObjectScore>() {
-
-                @Override
-                public MediaDataObjectScore call() throws Exception {
-                    from.eval(index, context, pe);
-                    rankBy.eval(context);
-                    final MediaDataObjectScore score = new MediaDataObjectScore(from.get(index), (Double) context.get("SCORE"));
-                    @SuppressWarnings({"unchecked"})
-                    final Set<mediamatrix.utils.Score<Integer, Double>> frames = (Set<mediamatrix.utils.Score<Integer, Double>>) context.get("FRAMES");
-                    score.setFrameCorrelation(frames);
-                    final Set<?> keys = context.keySet();
-                    for (final Iterator<?> it = keys.iterator(); it.hasNext();) {
-                        final String key = (String) it.next();
-                        if (context.get(key) instanceof CorrelationMatrix) {
-                            score.putCorrelationMatrix(key, (CorrelationMatrix) context.get(key));
-                        }
+            futures.add(executor.submit(() -> {
+                from.eval(index, context, pe);
+                rankBy.eval(context);
+                final MediaDataObjectScore score = new MediaDataObjectScore(from.get(index), (Double) context.get("SCORE"));                
+                @SuppressWarnings("unchecked")
+                final TreeSet<mediamatrix.utils.Score<Integer, Double>> frameCorrelation = (TreeSet<mediamatrix.utils.Score<Integer, Double>>) context.get("FRAMES");
+                score.setFrameCorrelation(frameCorrelation);
+                final Set<?> keys = context.keySet();
+                for (final Iterator<?> it = keys.iterator(); it.hasNext();) {
+                    final String key = (String) it.next();
+                    if (context.get(key) instanceof CorrelationMatrix correlationMatrix) {
+                        score.putCorrelationMatrix(key, correlationMatrix);
                     }
-                    return score;
                 }
+                return score;
             }));
         }
 

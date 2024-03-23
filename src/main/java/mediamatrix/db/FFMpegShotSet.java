@@ -3,12 +3,10 @@ package mediamatrix.db;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,19 +20,11 @@ public class FFMpegShotSet {
 
     public FFMpegShotSet(File dir) {
         this.dir = dir;
-        files = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().toLowerCase().endsWith(".jpg");
-            }
-        });
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File f1, File f2) {
-                String s1 = f1.getName().substring(0, f1.getName().lastIndexOf('.'));
-                String s2 = f2.getName().substring(0, f2.getName().lastIndexOf('.'));
-                return Integer.parseInt(s1) - Integer.parseInt(s2);
-            }
+        files = dir.listFiles((File pathname) -> pathname.getName().toLowerCase().endsWith(".jpg"));
+        Arrays.sort(files, (File f1, File f2) -> {
+            String s1 = f1.getName().substring(0, f1.getName().lastIndexOf('.'));
+            String s2 = f2.getName().substring(0, f2.getName().lastIndexOf('.'));
+            return Integer.parseInt(s1) - Integer.parseInt(s2);
         });
         index = 0;
     }
@@ -108,7 +98,7 @@ public class FFMpegShotSet {
             path = env.get("path");
         }
 
-        if (System.getProperty("os.name").indexOf("Windows") >= 0) {
+        if (System.getProperty("os.name").contains("Windows")) {
             cmd = cmd + ".exe";
         }
 
@@ -118,7 +108,7 @@ public class FFMpegShotSet {
         lists.add(new File("").getAbsolutePath());
         lists.addAll(Arrays.asList(dirs));
         lists.add("/usr/local/bin");
-        lists.add("/opt/local/bin");
+        lists.add("/opt/homebrew/bin");
 
         for (Iterator<String> it = lists.iterator(); it.hasNext();) {
             final File target = new File(it.next(), cmd);
@@ -137,8 +127,8 @@ public class FFMpegShotSet {
     }
 
     public void close() {
-        for (int i = 0; i < files.length; i++) {
-            files[i].delete();
+        for (File file : files) {
+            file.delete();
         }
         dir.delete();
     }

@@ -2,17 +2,20 @@ package mediamatrix.mvc;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.HashMap;
 import javax.swing.AbstractListModel;
+
 import mediamatrix.db.ChronoArchive;
 import mediamatrix.gui.ImageShot;
 import mediamatrix.utils.ImageUtilities;
 
-public class CARCImageShotListModel extends AbstractListModel<ImageShot> {
+public final class CARCImageShotListModel extends AbstractListModel<ImageShot> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-    private final ChronoArchive carc;
-    private HashMap<Integer, ImageShot> cache;
+    private transient final ChronoArchive carc;
+    private final HashMap<Integer, ImageShot> cache;
 
     public CARCImageShotListModel(ChronoArchive carc) {
         this.carc = carc;

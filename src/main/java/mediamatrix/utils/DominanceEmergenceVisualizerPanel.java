@@ -16,7 +16,7 @@ import mediamatrix.db.CorrelationScore;
 import mediamatrix.gui.ImageShot;
 import mediamatrix.mvc.ImageShotListCellRenderer;
 
-public class DominanceEmergenceVisualizerPanel extends JPanel {
+public final class DominanceEmergenceVisualizerPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 

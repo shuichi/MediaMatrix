@@ -2,6 +2,7 @@ package mediamatrix.utils;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 public class FileNameUtilities {
@@ -29,7 +30,7 @@ public class FileNameUtilities {
 
     public static URL toURL(File aFile) {
         try {
-            return new URL("file", "", slashify(aFile.getAbsolutePath(), aFile.isDirectory()));
+            return URI.create("file://" + slashify(aFile.getAbsolutePath(), aFile.isDirectory())).toURL();
         } catch (MalformedURLException ex) {
         }
         return null;

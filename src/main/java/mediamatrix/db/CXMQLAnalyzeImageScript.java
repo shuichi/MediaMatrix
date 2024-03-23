@@ -20,14 +20,14 @@ public class CXMQLAnalyzeImageScript extends CXMQLScript {
     public void setTarget(String dirname) {
         if (dirname.contains(",")) {
             final String[] names = dirname.split(",");
-            final List<File> list = new ArrayList<File>();
-            for (int j = 0; j < names.length; j++) {
-                final File file = new File(names[j].trim());
+            final List<File> list = new ArrayList<>();
+            for (String name : names) {
+                final File file = new File(name.trim());
                 if (file.exists()) {
                     list.add(file);
                 }
             }
-            files = list.toArray(new File[list.size()]);
+            files = list.toArray(File[]::new);
         } else if (new File(dirname).exists() && new File(dirname).isFile()) {
             files = new File[1];
             files[0] = new File(dirname);
@@ -43,14 +43,14 @@ public class CXMQLAnalyzeImageScript extends CXMQLScript {
 
     @Override
     public Map<String, Object> getVars() {
-        return new TreeMap<String, Object>();
+        return new TreeMap<>();
     }
 
     @Override
     public CXMQLResultSet eval() throws Exception {
-        final Set<MediaDataObjectScore> result = new TreeSet<MediaDataObjectScore>();
-        for (int i = 0; i < files.length; i++) {
-            result.add(new MediaDataObjectScore(new MediaDataObject(files[i].getAbsolutePath()), 0d));
+        final TreeSet<MediaDataObjectScore> result = new TreeSet<>();
+        for (File file : files) {
+            result.add(new MediaDataObjectScore(new MediaDataObject(file.getAbsolutePath()), 0d));
         }
         return new CXMQLResultSet(result, getType());
     }

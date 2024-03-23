@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import mediamatrix.io.SuffixFilenameFilter;
 
-public class ColorSchemePanel extends javax.swing.JPanel {
+public final class ColorSchemePanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private DefaultComboBoxModel<String> csModel;
