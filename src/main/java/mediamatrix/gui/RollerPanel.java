@@ -16,21 +16,11 @@
  */
 package mediamatrix.gui;
 
-import mediamatrix.db.ChronoArchive;
-import mediamatrix.db.CorrelationScore;
-import mediamatrix.db.NeighborRelevance;
-import mediamatrix.db.MediaMatrix;
-import mediamatrix.db.PrimitiveEngine;
-import mediamatrix.munsell.ColorImpressionKnowledge;
-import mediamatrix.utils.ImageUtilities;
-import mediamatrix.mvc.DoubleTableCellRenderer;
-import mediamatrix.mvc.ImpressionWordTableCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -38,11 +28,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -54,7 +44,15 @@ import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
+import mediamatrix.db.ChronoArchive;
+import mediamatrix.db.MediaMatrix;
+import mediamatrix.db.NeighborRelevance;
+import mediamatrix.db.PrimitiveEngine;
+import mediamatrix.munsell.ColorImpressionKnowledge;
+import mediamatrix.mvc.DoubleTableCellRenderer;
 import mediamatrix.mvc.ImageTableCellRenderer;
+import mediamatrix.mvc.ImpressionWordTableCellRenderer;
+import mediamatrix.utils.ImageUtilities;
 
 public final class RollerPanel extends JPanel {
 
@@ -189,12 +187,12 @@ class CARCListModel extends AbstractListModel<Image> {
     private static final long serialVersionUID = 1L;
     private final transient ChronoArchive originalCarc;
     private final transient ChronoArchive carc;
-    private final transient WeakHashMap<Integer, BufferedImage> imgCache;
+    private final transient HashMap<Integer, BufferedImage> imgCache;
 
     public CARCListModel(ChronoArchive originalCarc, ChronoArchive carc) {
         this.originalCarc = originalCarc;
         this.carc = carc;
-        imgCache = new WeakHashMap<>();
+        imgCache = new HashMap<>();
     }
 
     @Override

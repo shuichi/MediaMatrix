@@ -445,7 +445,12 @@ public class ChronoArchive {
             in = new DataInputStream(new BufferedInputStream(zipFile.getInputStream(zipFile.getEntry("MediaMatrix.obj"))));
             mat = new MediaMatrix();
             mat.read(in);
-            mat.setId(file.getAbsolutePath());
+            final String path = file.getAbsolutePath();
+            if (path == null) {
+                throw new IllegalArgumentException("readMatrix error:" + file.toString());
+            } else {
+                mat.setId(path);
+            }
         } finally {
             try {
                 if (in != null) {

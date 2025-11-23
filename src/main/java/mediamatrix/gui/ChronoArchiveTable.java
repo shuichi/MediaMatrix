@@ -1,7 +1,5 @@
 package mediamatrix.gui;
 
-import mediamatrix.db.ChronoArchive;
-
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -10,15 +8,15 @@ import java.io.Serial;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
-
+import mediamatrix.db.ChronoArchive;
 import mediamatrix.db.CorrelationScore;
 import mediamatrix.db.MediaMatrix;
 import mediamatrix.mvc.DoubleTableCellRenderer;
@@ -74,13 +72,13 @@ final class CARCTableModel extends AbstractTableModel {
     @Serial
     private static final long serialVersionUID = 1L;
     private transient final ChronoArchive carc;
-    private transient final WeakHashMap<Integer, BufferedImage> imgCache;
-    private transient final WeakHashMap<Integer, String> strCache;
+    private transient final HashMap<Integer, BufferedImage> imgCache;
+    private transient final HashMap<Integer, String> strCache;
 
     public CARCTableModel(final ChronoArchive carc) {
         this.carc = carc;
-        imgCache = new WeakHashMap<Integer, BufferedImage>();
-        strCache = new WeakHashMap<Integer, String>();
+        imgCache = new HashMap<Integer, BufferedImage>();
+        strCache = new HashMap<Integer, String>();
     }
 
     @Override

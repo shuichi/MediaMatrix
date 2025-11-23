@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
@@ -83,7 +85,7 @@ public class CXMQLQueryScript extends CXMQLScript {
             futures.add(executor.submit(() -> {
                 from.eval(index, context, pe);
                 rankBy.eval(context);
-                final MediaDataObjectScore score = new MediaDataObjectScore(from.get(index), (Double) context.get("SCORE"));                
+                final MediaDataObjectScore score = new MediaDataObjectScore(from.get(index), Optional.ofNullable((Double) context.get("SCORE")).orElse(0.0));
                 @SuppressWarnings("unchecked")
                 final TreeSet<mediamatrix.utils.Score<Integer, Double>> frameCorrelation = (TreeSet<mediamatrix.utils.Score<Integer, Double>>) context.get("FRAMES");
                 score.setFrameCorrelation(frameCorrelation);

@@ -217,6 +217,11 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                     final CXMQLVisualizeParser parser = new CXMQLVisualizeParser();
                     script = parser.parse(query);
                     result = script.eval();
+                    if (result == null) {
+                        System.err.println(String.format("CXMQLVisualizeParser Error: result is null: %s\n", query));
+                        System.err.println(script.dumpContextIds());
+                    }
+                    
                 } catch (final Exception ex) {
                     SwingUtilities.invokeLater(() -> {
                         ErrorUtils.showDialog(ex, MediaMatrixDatabaseFrame.this);
@@ -229,18 +234,19 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             @Override
             protected void done() {
                 try {
+                    final MediaMatrix mat = get();
                     if ("SEPARATE".equalsIgnoreCase(script.getProperty("WINDOW"))) {
-                        DialogUtils.showDialog(script.getTarget() + " - MediaMatrix Visualizer", new VideoMediaMatrixVisualizerPanel(get(), script), MediaMatrixDatabaseFrame.this);
+                        DialogUtils.showDialog(script.getTarget() + " - MediaMatrix Visualizer", new VideoMediaMatrixVisualizerPanel(mat, script), MediaMatrixDatabaseFrame.this);
                     } else {
                         if (script.getType().equalsIgnoreCase("VIDEO")) {
-                            showResult(new VideoMediaMatrixVisualizerPanel(get(), script), script.getTarget());
+                            showResult(new VideoMediaMatrixVisualizerPanel(mat, script), script.getTarget());
                         } else if (script.getType().equalsIgnoreCase("MUSIC")) {
                             if (script.getMatrixName().equalsIgnoreCase("Pitch")) {
-                                showResult(new PitchPanel(get()), script.getTarget());
+                                showResult(new PitchPanel(mat), script.getTarget());
                             } else if (script.getMatrixName().equalsIgnoreCase("Tonality")) {
-                                showResult(new TonalityPanel(get()), script.getTarget());
+                                showResult(new TonalityPanel(mat), script.getTarget());
                             } else if (script.getMatrixName().equalsIgnoreCase("Tempo")) {
-                                showResult(new TempoPanel(get()), script.getTarget());
+                                showResult(new TempoPanel(mat), script.getTarget());
                             }
                         }
                     }
