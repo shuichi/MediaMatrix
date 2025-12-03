@@ -1,7 +1,7 @@
 plugins {
     id 'java' 
     id 'application'
-    id 'org.beryx.runtime' version '2.0.1'
+    id 'org.beryx.jlink' version '3.1.3'
 }
 
 java {
@@ -36,15 +36,30 @@ wrapper {
 }
 
 application {
+    mainModule = 'MediaMatrix'
     mainClass = 'mediamatrix.MediaMatrix'
     applicationName = 'MediaMatrix'
-    applicationDefaultJvmArgs = ['--enable-native-access=ALL-UNNAMED']
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs << '-Xlint:all'
+  options.compilerArgs += [
+        '-Xlint:all',
+        '--add-reads', 'MediaMatrix=ALL-UNNAMED'
+    ]
+
   options.deprecation = true
 }
+
+
+tasks.named('run') {
+    doFirst {
+        jvmArgs += [
+            '--enable-native-access=ALL-UNNAMED',
+            '--add-reads', 'MediaMatrix=ALL-UNNAMED'
+        ]
+    }
+}
+
 
 jar {
     manifest {
@@ -53,35 +68,20 @@ jar {
     }
 }
 
-runtime {
-    modules = ['java.base', 'java.desktop', 'java.logging', 'java.net.http', 'java.prefs']
-    options = ['--strip-debug', '--no-header-files', '--no-man-pages', '--enable-native-access=ALL-UNNAMED']
+jlink {
+    options = ['--strip-debug', '--no-header-files', '--no-man-pages']
+    launcher{
+        name = 'MediaMatrix'
+        jvmArgs = ['--enable-native-access=ALL-UNNAMED']
+    }
+
     jpackage {
-        def currentOs = org.gradle.internal.os.OperatingSystem.current()
-        def imgType = currentOs.windows ? 'ico' : currentOs.macOsX ? 'icns' : 'png'
-        imageOptions += ['--icon', "src/main/resources/mediamatrix/icons/MediaMatrix.$imgType"]
-        installerOptions += ['--resource-dir', "src/main/resources"]
-        installerOptions += ['--vendor', 'Shuichi Kurabayashi']
-
-        if(currentOs.windows) {
-            installerOptions += ['--win-per-user-install', '--win-dir-chooser', '--win-menu', '--win-shortcut']
-        }
-        else if (currentOs.linux) {
-            installerOptions += ['--linux-package-name', 'MediaMatrix','--linux-shortcut']
-        }
-        else if (currentOs.macOsX) {
-            installerOptions += ['--mac-package-name', 'MediaMatrix']
-            installerType = 'dmg'
-        }
+        skipInstaller = true
+        imageName = 'MediaMatrix'
+        jvmArgs = [
+            '--enable-native-access=ALL-UNNAMED',
+            '--add-reads', 'MediaMatrix=ALL-UNNAMED'
+        ]
     }
 }
 
-
-tasks.jpackage.doFirst {
-    def currentOs = org.gradle.internal.os.OperatingSystem.current()
-    def basePath = currentOs.windows ? project.name : currentOs.linux ? "$project.name/lib" : "${project.name}.app/Contents"
-    copy {
-        from('src/main/resources')
-        into("$buildDir/jpackage/$basePath/app")
-    }
-}

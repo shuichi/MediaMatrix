@@ -74,12 +74,15 @@ public class MediaMatrix {
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
                 final MediaMatrixDatabaseFrame frame = new MediaMatrixDatabaseFrame();
                 Desktop desktop = Desktop.getDesktop();
-                desktop.setAboutHandler(e -> new AboutDialog(frame, true).setVisible(true));
-                desktop.setQuitHandler((e, r) -> {
-                    frame.storePrefs();
-                    frame.dispose();
-                    System.exit(0);
-                });
+                try {
+                    desktop.setAboutHandler(e -> new AboutDialog(frame, true).setVisible(true));
+                    desktop.setQuitHandler((e, r) -> {
+                        frame.storePrefs();
+                        frame.dispose();
+                        System.exit(0);
+                    });
+                } catch (Exception ignored) {
+                }
                 frame.setVisible(true);
             } catch (Exception ex) {
                 ErrorUtils.showDialog(ex);
