@@ -16,6 +16,7 @@
  */
 package mediamatrix;
 
+import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -36,7 +37,10 @@ import mediamatrix.utils.FileNameUtilities;
 
 public class MediaMatrix {
 
+    private MediaMatrix(){}
+    
     public static void main(final String[] args) {
+        FlatLightLaf.setup();
 
         for (String res : new String[]{"ColorEmotion_VIZ", "DominantEmotion_VIZ", "EmergentEmotion_VIZ", "Pitch_VIZ", "Tonality_VIZ"}) {
             final File aFile = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), res + ".cxmql");
@@ -70,9 +74,9 @@ public class MediaMatrix {
 
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                FlatLightLaf.setup();
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
                 final MediaMatrixDatabaseFrame frame = new MediaMatrixDatabaseFrame();
+                FlatLaf.updateUI();
                 Desktop desktop = Desktop.getDesktop();
                 desktop.setAboutHandler(e -> new AboutDialog(frame, true).setVisible(true));
                 desktop.setQuitHandler((e, r) -> {

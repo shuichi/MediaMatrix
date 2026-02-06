@@ -1,13 +1,20 @@
 plugins {
     id 'java' 
     id 'application'
-    id 'org.beryx.runtime' version '2.0.1'
+    id 'org.beryx.jlink' version '3.2.1'
+    id 'org.gradlex.extra-java-module-info' version '1.13.1'
 }
 
+def targetJava = 24
+def targetJavaVersion = JavaLanguageVersion.of(targetJava)
+
 java {
+    modularity.inferModulePath = true
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = targetJavaVersion
     }
+    sourceCompatibility = JavaVersion.toVersion(targetJava)
+    targetCompatibility = JavaVersion.toVersion(targetJava)
 }
 
 repositories {
@@ -27,6 +34,11 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:6.0.1'
 }
 
+extraJavaModuleInfo {
+    automaticModule("org.netbeans.external:AbsoluteLayout", "AbsoluteLayout.RELEASE280")
+    automaticModule("org.swinglabs.swingx:swingx-all", "swingx.all")
+}
+
 tasks.named('test') {
     useJUnitPlatform() 
 }
@@ -37,13 +49,15 @@ wrapper {
 
 application {
     mainClass = 'mediamatrix.MediaMatrix'
+    mainModule = 'mediamatrix'
     applicationName = 'MediaMatrix'
-    applicationDefaultJvmArgs = ['--enable-native-access=ALL-UNNAMED']
+    applicationDefaultJvmArgs = ['--enable-native-access=com.formdev.flatlaf']
 }
 
-tasks.withType(JavaCompile) {
-  options.compilerArgs << '-Xlint:all'
-  options.deprecation = true
+tasks.withType(JavaCompile).configureEach {
+    options.release = targetJava
+    options.compilerArgs << '-Xlint:all'
+    options.deprecation = true
 }
 
 jar {
@@ -53,23 +67,60 @@ jar {
     }
 }
 
-runtime {
-    modules = ['java.base', 'java.desktop', 'java.logging', 'java.net.http', 'java.prefs']
-    options = ['--strip-debug', '--no-header-files', '--no-man-pages', '--enable-native-access=ALL-UNNAMED']
+def buildOs = org.gradle.internal.os.OperatingSystem.current()
+def jlinkLauncher = javaToolchains.launcherFor {
+    languageVersion = targetJavaVersion
+}
+def jlinkHome = jlinkLauncher.map { it.metadata.installationPath }
+def needsJlinkJavaHomeLink = jlinkHome.map { it.asFile.path.contains(' ') }.orElse(false)
+def jlinkJavaHomeDir = layout.buildDirectory.dir('jlink-java-home')
+
+tasks.register('prepareJlinkJavaHome') {
+    onlyIf { !buildOs.windows && needsJlinkJavaHomeLink.get() }
+    doLast {
+        def targetPath = jlinkHome.get().asFile.toPath()
+        def linkPath = jlinkJavaHomeDir.get().asFile.toPath()
+        java.nio.file.Files.createDirectories(linkPath.getParent())
+        if (java.nio.file.Files.exists(linkPath)) {
+            java.nio.file.Files.delete(linkPath)
+        }
+        java.nio.file.Files.createSymbolicLink(linkPath, targetPath)
+    }
+}
+
+tasks.named('prepareMergedJarsDir') {
+    dependsOn(tasks.named('prepareJlinkJavaHome'))
+}
+
+jlink {
+    options = ['--strip-debug', '--no-header-files', '--no-man-pages']
+    if (!buildOs.windows && needsJlinkJavaHomeLink.get()) {
+        javaHome = jlinkJavaHomeDir
+    } else {
+        javaHome = jlinkHome
+    }
+    launcher {
+        jvmArgs = ['--enable-native-access=com.formdev.flatlaf']
+    }
+    mergedModule {
+        uses 'org.jdesktop.swingx.plaf.LookAndFeelAddons'
+        requires 'java.desktop'
+        requires 'java.logging'
+    }
     jpackage {
-        def currentOs = org.gradle.internal.os.OperatingSystem.current()
-        def imgType = currentOs.windows ? 'ico' : currentOs.macOsX ? 'icns' : 'png'
+        def imgType = buildOs.windows ? 'ico' : buildOs.macOsX ? 'icns' : 'png'
         imageOptions += ['--icon', "src/main/resources/mediamatrix/icons/MediaMatrix.$imgType"]
+        imageOptions += ['--java-options', '--enable-native-access=com.formdev.flatlaf']
         installerOptions += ['--resource-dir', "src/main/resources"]
         installerOptions += ['--vendor', 'Shuichi Kurabayashi']
 
-        if(currentOs.windows) {
+        if(buildOs.windows) {
             installerOptions += ['--win-per-user-install', '--win-dir-chooser', '--win-menu', '--win-shortcut']
         }
-        else if (currentOs.linux) {
+        else if (buildOs.linux) {
             installerOptions += ['--linux-package-name', 'MediaMatrix','--linux-shortcut']
         }
-        else if (currentOs.macOsX) {
+        else if (buildOs.macOsX) {
             installerOptions += ['--mac-package-name', 'MediaMatrix']
             installerType = 'dmg'
         }
@@ -78,8 +129,7 @@ runtime {
 
 
 tasks.jpackage.doFirst {
-    def currentOs = org.gradle.internal.os.OperatingSystem.current()
-    def basePath = currentOs.windows ? project.name : currentOs.linux ? "$project.name/lib" : "${project.name}.app/Contents"
+    def basePath = buildOs.windows ? project.name : buildOs.linux ? "$project.name/lib" : "${project.name}.app/Contents"
     copy {
         from('src/main/resources')
         into("$buildDir/jpackage/$basePath/app")
