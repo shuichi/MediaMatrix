@@ -41,7 +41,6 @@ public class MediaMatrix {
     
     public static void main(final String[] args) {
         FlatLightLaf.setup();
-
         for (String res : new String[]{"ColorEmotion_VIZ", "DominantEmotion_VIZ", "EmergentEmotion_VIZ", "Pitch_VIZ", "Tonality_VIZ"}) {
             final File aFile = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), res + ".cxmql");
             if (!aFile.exists()) {
@@ -76,7 +75,6 @@ public class MediaMatrix {
             try {
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
                 final MediaMatrixDatabaseFrame frame = new MediaMatrixDatabaseFrame();
-                FlatLaf.updateUI();
                 Desktop desktop = Desktop.getDesktop();
                 try {
                     desktop.setAboutHandler(e -> new AboutDialog(frame, true).setVisible(true));
@@ -88,6 +86,7 @@ public class MediaMatrix {
                 } catch (Exception ignored) {
                 }
                 frame.setVisible(true);
+                FlatLaf.updateUI();
             } catch (Exception ex) {
                 ErrorUtils.showDialog(ex);
             }

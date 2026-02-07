@@ -1,4 +1,5 @@
 .gradle
+.vscode
 .DS_Store
 .nb-gradle
 build/
