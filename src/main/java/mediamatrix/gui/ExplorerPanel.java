@@ -2,234 +2,251 @@ package mediamatrix.gui;
 
 import mediamatrix.db.FileOpenScriptGenerator;
 import mediamatrix.utils.FileNameUtilities;
-
+import mediamatrix.utils.IOUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-
-import mediamatrix.utils.IOUtilities;
-import org.jdesktop.swingx.JXTaskPane;
-import org.jdesktop.swingx.JXTaskPaneContainer;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 public final class ExplorerPanel extends JScrollPane {
 
     @Serial
     private static final long serialVersionUID = -4063699836849593357L;
-    private final JPopupMenu dbPopup = new JPopupMenu("File List");
+
+    private final JPopupMenu popup = new JPopupMenu("Tree");
     private final JMenuItem deleteItem = new JMenuItem("Delete");
-    private final JPopupMenu queryPopup = new JPopupMenu("File List");
-    private final JMenuItem deleteQueryItem = new JMenuItem("Delete");
-    private final JList<File> dbList;
-    private final JList<String> queryList;
-    private final JList<String> vizList;
-    private final DefaultListModel<File> dbModel = new DefaultListModel<File>();
-    private final DefaultListModel<String> queryModel = new DefaultListModel<String>();
-    private final DefaultListModel<String> vizModel = new DefaultListModel<String>();
+    private final JTree tree;
+    private final DefaultTreeModel treeModel;
+    private final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Explorer");
+    private final DefaultMutableTreeNode dbNode = new DefaultMutableTreeNode("Database");
+    private final DefaultMutableTreeNode queryNode = new DefaultMutableTreeNode("Query");
+    private final DefaultMutableTreeNode vizNode = new DefaultMutableTreeNode("VizScript");
     private String currentQueryName;
 
     public ExplorerPanel(final QueryEditor editor) {
         super();
-        final JXTaskPaneContainer taskPane = new JXTaskPaneContainer();
-        setViewportView(taskPane);
-        final JXTaskPane dbGroup = new JXTaskPane();
-        final JXTaskPane queryGroup = new JXTaskPane();
-        final JXTaskPane vizGroup = new JXTaskPane();
-        dbGroup.setTitle("Database");
-        queryGroup.setTitle("Query");
-        vizGroup.setTitle("VizScript");
+        rootNode.add(dbNode);
+        rootNode.add(queryNode);
+        rootNode.add(vizNode);
+        treeModel = new DefaultTreeModel(rootNode);
+        tree = new JTree(treeModel);
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        setViewportView(tree);
 
         for (File file : FileNameUtilities.getFilesInApplicationSubDirectory("CXMQL")) {
             final String name = file.getName().substring(0, file.getName().lastIndexOf('.'));
             if (name.endsWith("_VIZ")) {
-                vizModel.addElement(name);
+                addNodeIfAbsent(vizNode, name);
             } else {
-                queryModel.addElement(name);
+                addNodeIfAbsent(queryNode, name);
             }
         }
-        vizList = new JList<String>(vizModel);
-        dbList = new JList<File>(dbModel);
-        queryList = new JList<String>(queryModel);
-        dbGroup.add(dbList);
-        queryGroup.add(queryList);
-        vizGroup.add(vizList);
-        taskPane.add((JComponent) dbGroup);
-        taskPane.add((JComponent) queryGroup);
-        taskPane.add((JComponent) vizGroup);
-        vizGroup.setCollapsed(true);
-
-        dbList.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println(e.getKeyCode());
-                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
-                    final int index = dbList.getSelectedIndex();
-                    if (index > -1) {
-                        dbModel.remove(index);
-                    }
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-        });
 
         deleteItem.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                final int index = dbList.getSelectedIndex();
-                if (index > -1) {
-                    dbModel.remove(index);
-                }
+                deleteSelectedNode();
             }
         });
-        dbPopup.add(deleteItem);
+        popup.add(deleteItem);
 
-        deleteQueryItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String filename = null;
-                if (queryList.getSelectedIndex() > -1) {
-                    filename = queryModel.get(queryList.getSelectedIndex()) + ".cxmql";
-                    queryModel.remove(queryList.getSelectedIndex());
-                } else if (vizList.getSelectedIndex() > -1) {
-                    filename = vizModel.get(vizList.getSelectedIndex()) + ".cxmql";
-                    vizModel.remove(vizList.getSelectedIndex());
-                }
-
-                final File file = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), filename);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-        });
-        queryPopup.add(deleteQueryItem);
-
-        dbList.addMouseListener(new MouseAdapter() {
-
+        tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    final File file = dbModel.getElementAt(dbList.locationToIndex(e.getPoint()));
-                    if (file.exists()) {
-                        editor.setText(new FileOpenScriptGenerator().generate(file));
-                    } else {
-                        DialogUtils.showDialog("Error", new JLabel(file.getAbsolutePath() + " does not exist."), dbList);
-                    }
+                    handleDoubleClick(editor, e);
                 }
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
-                    dbPopup.show(dbList, e.getX(), e.getY());
-                }
+                showPopupIfNeeded(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopupIfNeeded(e);
             }
         });
 
-        queryList.addMouseListener(new MouseAdapter() {
-
+        tree.addKeyListener(new KeyAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    currentQueryName = queryModel.get(queryList.locationToIndex(e.getPoint())).toString();
-                    final File file = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), currentQueryName + ".cxmql");
-                    try {
-                        editor.setText(IOUtilities.readString(file, "UTF-8"));
-                    } catch (IOException ex) {
-                        ErrorUtils.showDialog(ex, ExplorerPanel.this);
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    final DefaultMutableTreeNode selected = getSelectedNode();
+                    if (selected != null && selected.getParent() == dbNode) {
+                        treeModel.removeNodeFromParent(selected);
                     }
                 }
             }
+        });
+
+        tree.addTreeExpansionListener(new TreeExpansionListener() {
+            @Override
+            public void treeExpanded(TreeExpansionEvent event) {
+            }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger() || SwingUtilities.isRightMouseButton(e)) {
-                    queryPopup.show(queryList, e.getX(), e.getY());
+            public void treeCollapsed(TreeExpansionEvent event) {
+                final Object node = event.getPath().getLastPathComponent();
+                if (node == rootNode) {
+                    tree.expandPath(event.getPath());
                 }
             }
         });
 
-        vizList.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    final File file = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), vizModel.get(vizList.locationToIndex(e.getPoint())).toString() + ".cxmql");
-                    try {
-                        editor.setText(IOUtilities.readString(file, "UTF-8"));
-                    } catch (IOException ex) {
-                        ErrorUtils.showDialog(ex, ExplorerPanel.this);
-                    }
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger() || SwingUtilities.isRightMouseButton(e)) {
-                    queryPopup.show(vizList, e.getX(), e.getY());
-                }
-            }
-        });
-
+        tree.expandPath(new TreePath(dbNode.getPath()));
+        tree.expandPath(new TreePath(queryNode.getPath()));
     }
 
     public void setDatabase(String[] dirs) {
         for (String name : dirs) {
-            dbModel.addElement(new File(name));
+            dbNode.add(new DefaultMutableTreeNode(new File(name)));
         }
+        treeModel.reload(dbNode);
     }
 
     public void addDatabase(String path) {
-        File file = new File(path);
-        if (!dbModel.contains(file)) {
-            dbModel.addElement(file);
+        final File file = new File(path);
+        if (!containsUserObject(dbNode, file)) {
+            treeModel.insertNodeInto(new DefaultMutableTreeNode(file), dbNode, dbNode.getChildCount());
         }
     }
 
     public void addQuery(String name) {
         if (name.endsWith("_VIZ")) {
-            if (!vizModel.contains(name)) {
-                vizModel.addElement(name);
-            }
+            addNodeIfAbsent(vizNode, name);
         } else {
-            if (!queryModel.contains(name)) {
-                queryModel.addElement(name);
-            }
+            addNodeIfAbsent(queryNode, name);
         }
     }
 
     public String[] getDatabase() {
-        List<String> list = new ArrayList<String>();
-        for (int i = 0; i < dbModel.size(); i++) {
-            list.add(dbModel.get(i).toString());
+        final List<String> list = new ArrayList<String>();
+        final Enumeration<?> children = dbNode.children();
+        while (children.hasMoreElements()) {
+            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement();
+            list.add(node.getUserObject().toString());
         }
         return list.toArray(new String[list.size()]);
     }
 
     public String getCurrentQueryName() {
         return currentQueryName;
+    }
+
+    private void handleDoubleClick(QueryEditor editor, MouseEvent e) {
+        final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+        if (path == null) {
+            return;
+        }
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+        if (parent == null || parent == rootNode) {
+            return;
+        }
+        if (parent == dbNode) {
+            final File file = (File) node.getUserObject();
+            if (file.exists()) {
+                editor.setText(new FileOpenScriptGenerator().generate(file));
+            } else {
+                DialogUtils.showDialog("Error", new JLabel(file.getAbsolutePath() + " does not exist."), tree);
+            }
+        } else if (parent == queryNode) {
+            currentQueryName = node.getUserObject().toString();
+            final File file = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), currentQueryName + ".cxmql");
+            try {
+                editor.setText(IOUtilities.readString(file, "UTF-8"));
+            } catch (IOException ex) {
+                ErrorUtils.showDialog(ex, this);
+            }
+        } else if (parent == vizNode) {
+            final File file = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), node.getUserObject().toString() + ".cxmql");
+            try {
+                editor.setText(IOUtilities.readString(file, "UTF-8"));
+            } catch (IOException ex) {
+                ErrorUtils.showDialog(ex, this);
+            }
+        }
+    }
+
+    private void showPopupIfNeeded(MouseEvent e) {
+        if (!e.isPopupTrigger() && !SwingUtilities.isRightMouseButton(e)) {
+            return;
+        }
+        final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+        if (path == null) {
+            return;
+        }
+        tree.setSelectionPath(path);
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+        if (parent == dbNode || parent == queryNode || parent == vizNode) {
+            popup.show(tree, e.getX(), e.getY());
+        }
+    }
+
+    private void deleteSelectedNode() {
+        final DefaultMutableTreeNode selected = getSelectedNode();
+        if (selected == null) {
+            return;
+        }
+        final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selected.getParent();
+        if (parent == null || parent == rootNode) {
+            return;
+        }
+        if (parent == queryNode || parent == vizNode) {
+            final String filename = selected.getUserObject().toString() + ".cxmql";
+            final File file = new File(FileNameUtilities.getApplicationSubDirectory("CXMQL"), filename);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+        treeModel.removeNodeFromParent(selected);
+    }
+
+    private DefaultMutableTreeNode getSelectedNode() {
+        final TreePath selectedPath = tree.getSelectionPath();
+        if (selectedPath == null) {
+            return null;
+        }
+        return (DefaultMutableTreeNode) selectedPath.getLastPathComponent();
+    }
+
+    private boolean containsUserObject(DefaultMutableTreeNode parent, Object value) {
+        final Enumeration<?> children = parent.children();
+        while (children.hasMoreElements()) {
+            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement();
+            if (value.equals(node.getUserObject())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void addNodeIfAbsent(DefaultMutableTreeNode parent, String value) {
+        if (!containsUserObject(parent, value)) {
+            treeModel.insertNodeInto(new DefaultMutableTreeNode(value), parent, parent.getChildCount());
+        }
     }
 }

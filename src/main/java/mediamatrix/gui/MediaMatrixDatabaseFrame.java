@@ -82,7 +82,6 @@ import mediamatrix.db.CorrelationMatrix;
 import mediamatrix.db.MediaMatrix;
 import mediamatrix.mvc.ImageTableCellRenderer;
 import mediamatrix.utils.IOUtilities;
-import org.jdesktop.swingx.JXStatusBar;
 
 public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
 
@@ -106,16 +105,16 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         mainSplitPane.setLeftComponent(explorer);
         dialog = new QueryProgressDialog(this);
 
-        getContentPane().add(new JXStatusBar() {
+        getContentPane().add(new StatusBar() {
 
             private static final long serialVersionUID = 8229103383556972292L;
 
             {
                 final JLabel statusLabel = new JLabel("version " + Version.VERSION);
-                final JXStatusBar.Constraint c1 = new JXStatusBar.Constraint();
+                final StatusBar.Constraint c1 = new StatusBar.Constraint();
                 c1.setFixedWidth(100);
                 final JButton gcButton = new JButton();
-                final JXStatusBar.Constraint c2 = new JXStatusBar.Constraint();
+                final StatusBar.Constraint c2 = new StatusBar.Constraint();
                 add(statusLabel, c1);
                 add(gcButton, c2);
                 gcButton.addActionListener((ActionEvent e) -> {
@@ -381,7 +380,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         fileMenu.setText("File");
 
         openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        openMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Database.png"))); // NOI18N
         openMenuItem.setMnemonic('O');
         openMenuItem.setText("Open Data");
         openMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -392,7 +390,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         fileMenu.add(openMenuItem);
 
         reindexMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        reindexMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Find.png"))); // NOI18N
         reindexMenuItem.setText("Delta Indexing");
         reindexMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -402,7 +399,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         fileMenu.add(reindexMenuItem);
 
         openQueryMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        openQueryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Fileopen.png"))); // NOI18N
         openQueryMenuItem.setMnemonic('C');
         openQueryMenuItem.setText("Open CXMQL");
         openQueryMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -413,7 +409,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         fileMenu.add(openQueryMenuItem);
 
         saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        saveMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Filesave.png"))); // NOI18N
         saveMenuItem.setMnemonic('S');
         saveMenuItem.setText("Save CXMQL");
         saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -424,7 +419,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         fileMenu.add(saveMenuItem);
 
         exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        exitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Exit.png"))); // NOI18N
         exitMenuItem.setMnemonic('x');
         exitMenuItem.setText("Exit");
         exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -440,7 +434,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         toolMenu.setText("Tool");
 
         execMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        execMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Execute.png"))); // NOI18N
         execMenuItem.setMnemonic('E');
         execMenuItem.setText("Execute Query");
         execMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -451,7 +444,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         toolMenu.add(execMenuItem);
 
         csMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        csMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Colortable.png"))); // NOI18N
         csMenuItem.setMnemonic('S');
         csMenuItem.setText("Color Scheme");
         csMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -466,7 +458,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         helpMenu.setMnemonic('H');
         helpMenu.setText("Help");
 
-        javaVMMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Java.png"))); // NOI18N
         javaVMMenuItem.setMnemonic('J');
         javaVMMenuItem.setText("Java VM Memory Usage");
         javaVMMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -476,7 +467,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         });
         helpMenu.add(javaVMMenuItem);
 
-        aboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mediamatrix/resources/Icon16.png"))); // NOI18N
         aboutMenuItem.setMnemonic('A');
         aboutMenuItem.setText("About MediaMatrix");
         aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {

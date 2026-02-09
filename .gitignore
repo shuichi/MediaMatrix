@@ -1,3 +1,5 @@
+.vscode/
+.idea/
 .gradle
 .DS_Store
 .nb-gradle

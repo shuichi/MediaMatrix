@@ -29,6 +29,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
+
+import javax.swing.UIManager;
+
 import mediamatrix.db.FFMpegShotSet;
 import mediamatrix.gui.AboutDialog;
 import mediamatrix.gui.ErrorUtils;
@@ -40,6 +43,10 @@ public class MediaMatrix {
     private MediaMatrix(){}
     
     public static void main(final String[] args) {
+        // On macOS this must be set before AWT/Swing initialization.
+        if (System.getProperty("os.name").contains("Mac")) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
         FlatLightLaf.setup();
 
         for (String res : new String[]{"ColorEmotion_VIZ", "DominantEmotion_VIZ", "EmergentEmotion_VIZ", "Pitch_VIZ", "Tonality_VIZ"}) {
@@ -74,9 +81,7 @@ public class MediaMatrix {
 
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                System.setProperty("apple.laf.useScreenMenuBar", "true");
                 final MediaMatrixDatabaseFrame frame = new MediaMatrixDatabaseFrame();
-                FlatLaf.updateUI();
                 Desktop desktop = Desktop.getDesktop();
                 desktop.setAboutHandler(e -> new AboutDialog(frame, true).setVisible(true));
                 desktop.setQuitHandler((e, r) -> {
@@ -85,6 +90,7 @@ public class MediaMatrix {
                     System.exit(0);
                 });
                 frame.setVisible(true);
+                FlatLaf.updateUI();
             } catch (Exception ex) {
                 ErrorUtils.showDialog(ex);
             }

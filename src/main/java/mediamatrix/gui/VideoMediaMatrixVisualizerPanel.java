@@ -40,7 +40,6 @@ import mediamatrix.munsell.ColorImpressionKnowledge;
 import mediamatrix.mvc.ImageShotListCellRenderer;
 import mediamatrix.mvc.ImageShotListModel;
 import mediamatrix.mvc.ImpressionWordListCellRenderer;
-import org.jdesktop.swingx.JXBusyLabel;
 
 public final class VideoMediaMatrixVisualizerPanel extends JPanel {
 
@@ -160,12 +159,9 @@ public final class VideoMediaMatrixVisualizerPanel extends JPanel {
                 add(new JScrollPane(canvas), BorderLayout.CENTER);
                 add(listScrollPane, BorderLayout.SOUTH);
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                final JXBusyLabel label = new JXBusyLabel(new Dimension(100, 100));
+                final BusySpinnerLabel label = new BusySpinnerLabel("Processing");
                 label.setHorizontalAlignment(JLabel.CENTER);
-                label.getBusyPainter().setPaintCentered(true);
-                label.getBusyPainter().setPoints(15);
-                label.getBusyPainter().setHighlightColor(new Color(44, 61, 146).darker());
-                label.getBusyPainter().setBaseColor(new Color(168, 204, 241).brighter());
+                label.setPreferredSize(new Dimension(100, 100));
                 label.setBusy(true);
                 add(label, BorderLayout.CENTER);
                 new SwingWorker<VisualizeResult, Object>() {
@@ -183,6 +179,7 @@ public final class VideoMediaMatrixVisualizerPanel extends JPanel {
                         try {
                             result = get();
                             canvas.setIcon(new ImageIcon(result.getImage()));
+                            label.setBusy(false);
                             remove(label);
                             add(new JScrollPane(canvas), BorderLayout.CENTER);
                             list.setModel(result.getModel());
@@ -190,6 +187,7 @@ public final class VideoMediaMatrixVisualizerPanel extends JPanel {
                             repaint();
                             setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                         } catch (InterruptedException | ExecutionException ex) {
+                            label.setBusy(false);
                             ErrorUtils.showDialog(ex, VideoMediaMatrixVisualizerPanel.this);
                         }
                     }

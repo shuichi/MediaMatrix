@@ -25,7 +25,6 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
-import org.jdesktop.swingx.JXStatusBar;
 
 public final class MusicMediaMatrixPanel extends JPanel {
 
@@ -36,9 +35,9 @@ public final class MusicMediaMatrixPanel extends JPanel {
     public MusicMediaMatrixPanel() {
         initComponents();
         add(new TonalityColorPanel(), BorderLayout.SOUTH);
-        final JXStatusBar bar = new JXStatusBar();
+        final StatusBar bar = new StatusBar();
         statusLabel = new JLabel();
-        final JXStatusBar.Constraint c1 = new JXStatusBar.Constraint();
+        final StatusBar.Constraint c1 = new StatusBar.Constraint();
         bar.add(statusLabel, c1);
         add(bar, BorderLayout.SOUTH);
     }

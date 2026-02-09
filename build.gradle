@@ -5,8 +5,11 @@ plugins {
     id 'org.gradlex.extra-java-module-info' version '1.13.1'
 }
 
-def targetJava = 24
+def targetJava = 25
 def targetJavaVersion = JavaLanguageVersion.of(targetJava)
+def jvmArgs = [
+        '--enable-native-access=com.formdev.flatlaf'
+]
 
 java {
     modularity.inferModulePath = true
@@ -26,17 +29,17 @@ repositories {
 
 dependencies {
     implementation 'org.jfree:jfreechart:1.5.6'
-    implementation 'com.formdev:flatlaf:3.6.2'
-    implementation 'org.apache.commons:commons-jexl3:3.6.0'
+    implementation 'com.formdev:flatlaf:3.7'
+    implementation 'com.formdev:flatlaf-extras:3.7'
+    implementation 'com.github.weisj:jsvg:2.0.0'
+    implementation 'org.apache.commons:commons-jexl3:3.6.1'
     implementation 'org.netbeans.external:AbsoluteLayout:RELEASE280'
-    implementation 'org.swinglabs.swingx:swingx-all:1.6.5-1'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.2'
 }
 
 extraJavaModuleInfo {
     automaticModule("org.netbeans.external:AbsoluteLayout", "AbsoluteLayout.RELEASE280")
-    automaticModule("org.swinglabs.swingx:swingx-all", "swingx.all")
 }
 
 tasks.named('test') {
@@ -44,14 +47,14 @@ tasks.named('test') {
 }
 
 wrapper {
-    gradleVersion = '9.2.1'
+    gradleVersion = '9.3.1'
 }
 
 application {
     mainClass = 'mediamatrix.MediaMatrix'
     mainModule = 'mediamatrix'
     applicationName = 'MediaMatrix'
-    applicationDefaultJvmArgs = ['--enable-native-access=com.formdev.flatlaf']
+    applicationDefaultJvmArgs = jvmArgs
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -100,17 +103,15 @@ jlink {
         javaHome = jlinkHome
     }
     launcher {
-        jvmArgs = ['--enable-native-access=com.formdev.flatlaf']
+        jvmArgs = jvmArgs
     }
     mergedModule {
-        uses 'org.jdesktop.swingx.plaf.LookAndFeelAddons'
         requires 'java.desktop'
         requires 'java.logging'
     }
     jpackage {
         def imgType = buildOs.windows ? 'ico' : buildOs.macOsX ? 'icns' : 'png'
         imageOptions += ['--icon', "src/main/resources/mediamatrix/icons/MediaMatrix.$imgType"]
-        imageOptions += ['--java-options', '--enable-native-access=com.formdev.flatlaf']
         installerOptions += ['--resource-dir', "src/main/resources"]
         installerOptions += ['--vendor', 'Shuichi Kurabayashi']
 

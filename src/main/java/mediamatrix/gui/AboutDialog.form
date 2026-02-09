@@ -65,7 +65,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="versionLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-              <Component id="aTabbedPane" pref="207" max="32767" attributes="0"/>
+              <Component id="aTabbedPane" pref="219" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
               <Component id="okButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -85,7 +85,7 @@
     <Component class="javax.swing.JLabel" name="splashLabel">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/mediamatrix/resources/Splash.png"/>
+          <Image iconType="3" name="/mediamatrix/icons/Splash.png"/>
         </Property>
       </Properties>
     </Component>
@@ -146,9 +146,6 @@
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="License">
                 <Property name="tabTitle" type="java.lang.String" value="License"/>
-                <Property name="tabIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/mediamatrix/resources/gplv3.png"/>
-                </Property>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -185,7 +182,7 @@
                 <Property name="columns" type="int" value="20"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="MediaMatrix includes/uses the following softwares.&#xa;&#xa;Apache Commons JEXL version 3.2.1&#xa;http://commons.apache.org/jexl/&#xa;Lisenced under the Apache License, Version 2.0&#xa;&#xa;The JFreeChart Class Library Version 1.5.3&#xa;http://www.jfree.org/jfreechart/&#xa;Licensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.&#xa;&#xa;SwingLabs SwingX Complete Version 1.6.5-1&#xa;http://swingx.dev.java.net&#xa;Licensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.&#xa;&#xa;FlatLaf Version 2.4&#xa;https://www.formdev.com/flatlaf/&#xa;Lisenced under the Apache License, Version 2.0&#xa;&#xa;Apache NetBeans Absolute Layout RELEASE150&#xa;https://netbeans.apache.org&#xa;Lisenced under the Apache License, Version 2.0" noResource="true"/>
+                <Property name="text" type="java.lang.String" value="MediaMatrix includes/uses the following software.&#xa;&#xa;Apache Commons JEXL version 3.6.1&#xa;http://commons.apache.org/jexl/&#xa;Licensed under the Apache License, Version 2.0&#xa;&#xa;The JFreeChart Class Library Version 1.5.6&#xa;http://www.jfree.org/jfreechart/&#xa;Licensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.&#xa;&#xa;FlatLaf Version 3.7&#xa;https://www.formdev.com/flatlaf/&#xa;Licensed under the Apache License, Version 2.0&#xa;&#xa;Apache NetBeans Absolute Layout RELEASE280&#xa;https://netbeans.apache.org&#xa;Licensed under the Apache License, Version 2.0" noResource="true"/>
               </Properties>
             </Component>
           </SubComponents>
