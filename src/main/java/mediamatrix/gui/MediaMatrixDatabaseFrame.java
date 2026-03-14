@@ -15,14 +15,11 @@
  */
 package mediamatrix.gui;
 
-import mediamatrix.utils.FileNameUtilities;
-import mediamatrix.db.FileOpenScriptGenerator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -33,7 +30,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serial;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,7 +56,6 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.Timer;
 import javax.swing.table.TableColumnModel;
 import mediamatrix.action.ColorMediaMatrixAction;
 import mediamatrix.action.CopyAsOpenAction;
@@ -79,8 +74,10 @@ import mediamatrix.db.CXMQLScript;
 import mediamatrix.db.CXMQLVisualizeParser;
 import mediamatrix.db.CXMQLVisualizeScript;
 import mediamatrix.db.CorrelationMatrix;
+import mediamatrix.db.FileOpenScriptGenerator;
 import mediamatrix.db.MediaMatrix;
 import mediamatrix.mvc.ImageTableCellRenderer;
+import mediamatrix.utils.FileNameUtilities;
 import mediamatrix.utils.IOUtilities;
 
 public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
@@ -111,17 +108,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         mainSplitPane.setLeftComponent(explorer);
         dialog = new QueryProgressDialog(this);
 
-        getContentPane().add(new StatusBar() {
-
-            private static final long serialVersionUID = 8229103383556972292L;
-
-            {
-                final JLabel statusLabel = new JLabel("version " + Version.VERSION);
-                final StatusBar.Constraint c1 = new StatusBar.Constraint();
-                c1.setFixedWidth(100);
-                add(statusLabel, c1);
-            }
-        }, BorderLayout.SOUTH);
         if (System.getProperty("os.name").contains("Mac")) {
             openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.META_DOWN_MASK));
             openQueryMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_DOWN_MASK));
