@@ -16,18 +16,15 @@
  */
 package mediamatrix.gui;
 
-import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.JDialog;
 
 public final class AboutDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 1L;
-    private static final int SPLASH_TARGET_WIDTH = 534;
 
     public AboutDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        splashLabel.setIcon(new FlatSVGIcon("mediamatrix/icons/Splash.svg"));
         versionLabel.setText("version " + Version.VERSION);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         gplTextArea.setCaretPosition(1);

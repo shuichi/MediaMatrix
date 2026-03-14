@@ -95,7 +95,13 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
     public MediaMatrixDatabaseFrame() {
         initComponents();
         try {
-            setIconImage(ImageIO.read(getClass().getResource("/mediamatrix/resources/Icon.png")));
+            setIconImages(List.of(
+                    ImageIO.read(getClass().getResource("/mediamatrix/icons/icon_016.png")),
+                    ImageIO.read(getClass().getResource("/mediamatrix/icons/icon_032.png")),
+                    ImageIO.read(getClass().getResource("/mediamatrix/icons/icon_048.png")),
+                    ImageIO.read(getClass().getResource("/mediamatrix/icons/icon_128.png")),
+                    ImageIO.read(getClass().getResource("/mediamatrix/icons/icon_256.png")),
+                    ImageIO.read(getClass().getResource("/mediamatrix/icons/icon_512.png"))));
         } catch (IOException ignored) {
         }
 
@@ -113,25 +119,7 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                 final JLabel statusLabel = new JLabel("version " + Version.VERSION);
                 final StatusBar.Constraint c1 = new StatusBar.Constraint();
                 c1.setFixedWidth(100);
-                final JButton gcButton = new JButton();
-                final StatusBar.Constraint c2 = new StatusBar.Constraint();
                 add(statusLabel, c1);
-                add(gcButton, c2);
-                gcButton.addActionListener((ActionEvent e) -> {
-                    System.gc();
-                });
-                final Timer timer = new Timer(1000, (ActionEvent e) -> {
-                    final DecimalFormat f1 = new DecimalFormat("#,###MB");
-                    final DecimalFormat f2 = new DecimalFormat("##.#");
-                    final long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
-                    final long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
-                    final long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
-                    final long used = total - free;
-                    final double ratio = (used * 100 / (double) total);
-                    final String info = "Java Heap Total=" + f1.format(total) + ", " + "Used=" + f1.format(used) + " (" + f2.format(ratio) + "%), " + "Max=" + f1.format(max);
-                    gcButton.setText(info);
-                });
-                timer.start();
             }
         }, BorderLayout.SOUTH);
         if (System.getProperty("os.name").contains("Mac")) {
@@ -220,7 +208,7 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                         System.err.println(String.format("CXMQLVisualizeParser Error: result is null: %s\n", query));
                         System.err.println(script.dumpContextIds());
                     }
-                    
+
                 } catch (final Exception ex) {
                     SwingUtilities.invokeLater(() -> {
                         ErrorUtils.showDialog(ex, MediaMatrixDatabaseFrame.this);
@@ -607,8 +595,10 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
                     final String key = (String) box.getSelectedItem();
                     final Object obj = vars.get(key);
                     switch (obj) {
-                        case MediaMatrix mediaMatrix -> DialogUtils.showDialog(key, new MediaMatrixSplineGraphPanel(mediaMatrix), QueryResultPanel.this);
-                        case CorrelationMatrix correlationMatrix -> DialogUtils.showDialog(key, new CorrelationMatrixPanel(correlationMatrix), QueryResultPanel.this);
+                        case MediaMatrix mediaMatrix ->
+                            DialogUtils.showDialog(key, new MediaMatrixSplineGraphPanel(mediaMatrix), QueryResultPanel.this);
+                        case CorrelationMatrix correlationMatrix ->
+                            DialogUtils.showDialog(key, new CorrelationMatrixPanel(correlationMatrix), QueryResultPanel.this);
                         default -> {
                         }
                     }
