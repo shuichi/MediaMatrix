@@ -16,6 +16,8 @@
  */
 package mediamatrix.gui;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import java.net.URL;
 import javax.swing.JDialog;
 
 public final class AboutDialog extends javax.swing.JDialog {
@@ -25,6 +27,8 @@ public final class AboutDialog extends javax.swing.JDialog {
     public AboutDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        URL splash = getClass().getResource("/mediamatrix/icons/Splash.svg");
+        splashLabel.setIcon(new FlatSVGIcon(splash));
         versionLabel.setText("version " + Version.VERSION);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         gplTextArea.setCaretPosition(1);

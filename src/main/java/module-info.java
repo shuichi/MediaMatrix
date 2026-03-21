@@ -5,6 +5,7 @@ open module mediamatrix {
 
     requires com.formdev.flatlaf;
     requires com.formdev.flatlaf.extras;
+    requires com.github.weisj.jsvg;
     requires org.apache.commons.jexl3;
     requires org.jfree.jfreechart;
     requires org.netbeans.lib.awtextra;
