@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -23,6 +22,8 @@ import mediamatrix.db.MediaMatrix;
 import mediamatrix.db.PrimitiveEngine;
 import mediamatrix.gui.ColorSchemeSelectionPanel;
 import mediamatrix.gui.ErrorUtils;
+import mediamatrix.gui.HiDpiImageIcon;
+import mediamatrix.gui.HiDpiSupport;
 import mediamatrix.gui.ImageShot;
 import mediamatrix.gui.VisualizationEngine;
 import mediamatrix.munsell.ColorImpressionKnowledge;
@@ -62,6 +63,7 @@ public final class SelectableMediaMatrixVisualizerPanel extends JPanel {
         add(listScrollPane, BorderLayout.SOUTH);
         add(colorSchemeSelectionPanel, BorderLayout.WEST);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        final HiDpiSupport.ScaleFactor scaleFactor = HiDpiSupport.scaleFactor(canvas);
         new SwingWorker<BufferedImage, Object>() {
 
             @Override
@@ -75,14 +77,14 @@ public final class SelectableMediaMatrixVisualizerPanel extends JPanel {
                 });
                 model = new CARCImageShotListModel(carc);
                 mat = pe.projection(mat, selectedWords);
-                return new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height);
+                return new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height, scaleFactor.scaleX(), scaleFactor.scaleY());
             }
 
             @Override
             protected void done() {
                 try {
                     final BufferedImage image = get();
-                    canvas.setIcon(new ImageIcon(image));
+                    canvas.setIcon(new HiDpiImageIcon(image, width, height));
                     list.setModel(model);
                     revalidate();
                     repaint();

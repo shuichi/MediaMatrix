@@ -7,6 +7,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -54,37 +55,48 @@ public final class QueryEditor extends JTextPane {
 
     private void setHighlight() {
         SwingUtilities.invokeLater(() -> {
-            final String text = getText();
             final StyledDocument doc = getStyledDocument();
-            doc.setCharacterAttributes(0, text.length(), new SimpleAttributeSet(), true);
-            
+            final String text;
+            try {
+                text = doc.getText(0, doc.getLength());
+            } catch (BadLocationException ex) {
+                return;
+            }
+            doc.setCharacterAttributes(0, doc.getLength(), new SimpleAttributeSet(), true);
+
             final SimpleAttributeSet attr2 = new SimpleAttributeSet();
             StyleConstants.setForeground(attr2, new Color(10, 100, 10));
             StyleConstants.setBold(attr2, true);
-            for (String RESERVED1 : RESERVED) {
-                int pos = text.indexOf(RESERVED1);
+            for (String reserved : RESERVED) {
+                int pos = text.indexOf(reserved);
                 while (pos > -1) {
-                    doc.setCharacterAttributes(pos, RESERVED1.length(), attr2, true);
-                    pos = text.indexOf(RESERVED1, pos + RESERVED1.length());
+                    doc.setCharacterAttributes(pos, reserved.length(), attr2, true);
+                    pos = text.indexOf(reserved, pos + reserved.length());
                 }
             }
-            
+
             final SimpleAttributeSet attr = new SimpleAttributeSet();
             StyleConstants.setBold(attr, true);
             StyleConstants.setForeground(attr, Color.BLUE);
-            for (String KEYWORDS1 : KEYWORDS) {
-                int pos = text.indexOf(KEYWORDS1);
+            for (String keyword : KEYWORDS) {
+                int pos = text.indexOf(keyword);
                 while (pos > -1) {
-                    doc.setCharacterAttributes(pos, KEYWORDS1.length(), attr, true);
-                    pos = text.indexOf(KEYWORDS1, pos + KEYWORDS1.length());
+                    doc.setCharacterAttributes(pos, keyword.length(), attr, true);
+                    pos = text.indexOf(keyword, pos + keyword.length());
                 }
             }
-            
+
             final SimpleAttributeSet attr3 = new SimpleAttributeSet();
             StyleConstants.setUnderline(attr3, true);
             StyleConstants.setForeground(attr3, new Color(100, 10, 10));
             int pos = text.indexOf("FROM");
-            doc.setCharacterAttributes(text.indexOf("[", pos) + 1, text.indexOf("]", pos) - text.indexOf("[", pos) - 1, attr3, true);
+            if (pos > -1) {
+                final int start = text.indexOf("[", pos);
+                final int end = text.indexOf("]", pos);
+                if (start > -1 && end > start) {
+                    doc.setCharacterAttributes(start + 1, end - start - 1, attr3, true);
+                }
+            }
         });
     }
 }

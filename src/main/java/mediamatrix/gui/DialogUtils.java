@@ -17,17 +17,6 @@ public class DialogUtils {
 
     private static JDialog jvmDialog;
 
-    public static void showJVMMemoryStatDialog(Window parent) {
-        if (jvmDialog == null) {
-            jvmDialog = new JDialog(parent);
-            jvmDialog.setModal(false);
-            jvmDialog.setTitle("JVM Memory Profiler");
-            jvmDialog.getContentPane().add(new JVMMemoryProfilerPanel(), BorderLayout.CENTER);
-            jvmDialog.pack();
-        }
-        jvmDialog.setVisible(true);
-    }
-
     public static void saveWindowSize(Window window) {
         final Preferences prefs = Preferences.userNodeForPackage(window.getClass());
         prefs.putInt("x", window.getBounds().x);

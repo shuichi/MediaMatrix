@@ -1,39 +1,23 @@
 package mediamatrix.gui;
 
-import mediamatrix.mvc.MediaMatrixXYDataSetAdapter;
-import mediamatrix.db.ChronoArchive;
-import mediamatrix.db.MediaMatrix;
-import mediamatrix.dendrogram.Node;
-import mediamatrix.utils.ImageUtilities;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYSplineRenderer;
-import org.jfree.chart.title.LegendTitle;
-import org.jfree.chart.ui.RectangleInsets;
+import mediamatrix.db.ChronoArchive;
+import mediamatrix.db.MediaMatrix;
+import mediamatrix.dendrogram.Node;
+import mediamatrix.utils.ImageUtilities;
 
 public class VisualizationEngine {
 
     public BufferedImage createChartImage(MediaMatrix mat, Color bgColor, int width, int height) {
-        final XYSplineRenderer renderer = new XYSplineRenderer();
-        final NumberAxis xAxis = new NumberAxis("Time");
-        final NumberAxis yAxis = new NumberAxis("Score");
-        final XYPlot plot = new XYPlot(new MediaMatrixXYDataSetAdapter(mat), xAxis, yAxis, renderer);
-        plot.setBackgroundPaint(bgColor);
-        plot.setDomainGridlinePaint(Color.white);
-        plot.setRangeGridlinePaint(Color.white);
-        plot.setAxisOffset(new RectangleInsets(4, 4, 4, 4));
-        final JFreeChart chart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-        chart.setBackgroundPaint(Color.white);
-        final LegendTitle legendTitle = chart.getLegend();
-        legendTitle.setItemFont(new Font("SanSerif", Font.PLAIN, 14));
-        return chart.createBufferedImage(width, height);
+        return new Java2DChartRenderer().createChartImage(mat, bgColor, width, height);
+    }
+
+    public BufferedImage createChartImage(MediaMatrix mat, Color bgColor, int width, int height, double scaleX, double scaleY) {
+        return new Java2DChartRenderer().createChartImage(mat, bgColor, width, height, scaleX, scaleY);
     }
 
     public BufferedImage drawDendrogram(Node node, ChronoArchive carc, int margin, int itemWidth, int itemHeight) throws IOException {

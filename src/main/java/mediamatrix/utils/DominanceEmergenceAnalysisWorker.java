@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 import javax.swing.AbstractListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -22,6 +21,8 @@ import mediamatrix.db.MediaMatrix;
 import mediamatrix.db.PrimitiveEngine;
 import mediamatrix.gui.DialogUtils;
 import mediamatrix.gui.ErrorUtils;
+import mediamatrix.gui.HiDpiImageIcon;
+import mediamatrix.gui.HiDpiSupport;
 import mediamatrix.gui.ImageShot;
 import mediamatrix.gui.MunsellImagePanel;
 import mediamatrix.gui.VisualizationEngine;
@@ -41,6 +42,7 @@ public class DominanceEmergenceAnalysisWorker extends SwingWorker<DominanceEmerg
     private int height;
     private double threshold;
     private final boolean isECS;
+    private final HiDpiSupport.ScaleFactor scaleFactor;
 
     public DominanceEmergenceAnalysisWorker(JComponent parent, JLabel imageLabel, JList<ImageShot> imageList, JList<CorrelationScore> csList, ChronoArchive carc, int width, int height, double threshold, boolean isECS) {
         this.parent = parent;
@@ -52,6 +54,7 @@ public class DominanceEmergenceAnalysisWorker extends SwingWorker<DominanceEmerg
         this.height = height;
         this.threshold = threshold;
         this.isECS = isECS;
+        this.scaleFactor = HiDpiSupport.scaleFactor(imageLabel);
     }
 
     private List<ImageShot> analyze(MediaMatrix mat) throws IOException {
@@ -90,7 +93,7 @@ public class DominanceEmergenceAnalysisWorker extends SwingWorker<DominanceEmerg
         } else {
             result = pe.dcs(mat);
         }
-        final BufferedImage image = ve.createChartImage(result, Color.lightGray, width, height);
+        final BufferedImage image = ve.createChartImage(result, Color.lightGray, width, height, scaleFactor.scaleX(), scaleFactor.scaleY());
         final ImageShotListModel model = new ImageShotListModel(analyze(result));
         return new DominanceEmergenceAnalysisResult(image, model, ci, result);
     }
@@ -99,7 +102,7 @@ public class DominanceEmergenceAnalysisWorker extends SwingWorker<DominanceEmerg
     protected void done() {
         try {
             final DominanceEmergenceAnalysisResult obj = get();
-            imageLabel.setIcon(new ImageIcon(obj.getImage()));
+            imageLabel.setIcon(new HiDpiImageIcon(obj.getImage(), width, height));
             imageList.setModel(obj.getModel());
             imageList.addListSelectionListener(new ListSelectionListener() {
 

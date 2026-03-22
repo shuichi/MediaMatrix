@@ -1,5 +1,6 @@
 package mediamatrix.gui;
 
+import java.awt.AlphaComposite;
 import mediamatrix.db.ChronoArchive;
 import mediamatrix.db.MediaMatrix;
 import mediamatrix.db.PrimitiveEngine;
@@ -120,7 +121,7 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
     private void updateLens() {
         for (Lens lens : lensList) {
             for (MediaMatrixChart mediaMatrixChart : chartList) {
-                if (lens.getX() > mediaMatrixChart.getX() && lens.getX() < mediaMatrixChart.getX() + mediaMatrixChart.getImage().getWidth()) {
+                if (lens.getX() > mediaMatrixChart.getX() && lens.getX() < mediaMatrixChart.getX() + mediaMatrixChart.getWidth()) {
                     final ChronoArchive carc = mediaMatrixChart.getCarc();
                     final double ratio = (double) (lens.getX() - mediaMatrixChart.getX() - mediaMatrixChart.getXMargin()) / (double) (mediaMatrixChart.getLineWidth());
                     final int start = (int) ((carc.size() + ((Number) marginSpinner.getValue()).intValue()) * ratio);
@@ -407,9 +408,11 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
     class DrawWorker extends SwingWorker<MediaMatrixChart, Object> {
 
         private final File file;
+        private final HiDpiSupport.ScaleFactor scaleFactor;
 
         public DrawWorker(File file) {
             this.file = file;
+            this.scaleFactor = HiDpiSupport.scaleFactor(canvasPanel);
         }
 
         @Override
@@ -424,8 +427,8 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
             int width = ((Integer) widthSpinner.getModel().getValue());
             int height = ((Integer) heightSpinner.getModel().getValue());
             mat = pe.projection(mat, selectedWords);
-            final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height);
-            return new MediaMatrixChart(new ChronoArchive(file), mat, image, chartList.size() * 20, chartList.size() * 20, image.getWidth(), image.getHeight());
+            final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height, scaleFactor.scaleX(), scaleFactor.scaleY());
+            return new MediaMatrixChart(new ChronoArchive(file), mat, image, chartList.size() * 20, chartList.size() * 20, width, height);
         }
 
         @Override
@@ -446,7 +449,7 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
                 listScrollPane.setViewportView(list);
                 lensBoxPanel.add(listScrollPane);
                 chart.setList(list);
-                final JLabel label = new JLabel(new ImageIcon(chart.getImage()));
+                final JLabel label = new JLabel(chart.getDisplayIcon());
                 chart.setLabel(label);
                 label.setOpaque(false);
                 chartList.add(chart);
@@ -464,7 +467,10 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
 
     class RedrawAllWorker extends SwingWorker<Object, Object> {
 
+        private final HiDpiSupport.ScaleFactor scaleFactor;
+
         public RedrawAllWorker() {
+            this.scaleFactor = HiDpiSupport.scaleFactor(canvasPanel);
         }
 
         @Override
@@ -474,10 +480,10 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
             for (MediaMatrixChart chart : chartList) {
                 final PrimitiveEngine pe = new PrimitiveEngine();
                 final MediaMatrix mat = pe.projection(chart.getMatrix(), selectedWords);
-                final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height);
-                chart.setImage(image);
-                chart.setHeight(height);
                 chart.setWidth(width);
+                chart.setHeight(height);
+                final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height, scaleFactor.scaleX(), scaleFactor.scaleY());
+                chart.setImage(image);
             }
             return chartList;
         }
@@ -496,9 +502,11 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
     class RedrawWorker extends SwingWorker<MediaMatrixChart, Object> {
 
         private final MediaMatrixChart chart;
+        private final HiDpiSupport.ScaleFactor scaleFactor;
 
         public RedrawWorker(MediaMatrixChart chart) {
             this.chart = chart;
+            this.scaleFactor = HiDpiSupport.scaleFactor(canvasPanel);
         }
 
         @Override
@@ -507,10 +515,10 @@ public final class MediaInspectorPanel extends javax.swing.JPanel {
             int height = ((Integer) heightSpinner.getModel().getValue());
             final PrimitiveEngine pe = new PrimitiveEngine();
             final MediaMatrix mat = pe.projection(chart.getMatrix(), selectedWords);
-            final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height);
-            chart.setImage(image);
-            chart.setHeight(height);
             chart.setWidth(width);
+            chart.setHeight(height);
+            final BufferedImage image = new VisualizationEngine().createChartImage(mat, Color.lightGray, width, height, scaleFactor.scaleX(), scaleFactor.scaleY());
+            chart.setImage(image);
             return chart;
         }
 
@@ -669,6 +677,7 @@ class MediaMatrixChart implements Serializable {
     private MediaMatrix matrix;
     private transient BufferedImage image;
     private transient BufferedImage alphaImage;
+    private transient HiDpiImageIcon displayIcon;
     private JLabel label;
     private int x;
     private int y;
@@ -693,41 +702,12 @@ class MediaMatrixChart implements Serializable {
     public MediaMatrixChart(ChronoArchive carc, MediaMatrix mat, BufferedImage image, int x, int y, int width, int height) {
         this.carc = carc;
         this.matrix = mat;
-        this.image = image;
-        alphaImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        final Graphics2D g2 = (Graphics2D) alphaImage.getGraphics();
-        for (int i = 0; i < image.getWidth(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
-                Color c = new Color(image.getRGB(i, j));
-                g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 120));
-                g2.drawLine(i, j, i, j);
-            }
-        }
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-
-        int line = 0;
-        for (int i = image.getHeight() - 1; i >= 0; i--) {
-            int count = 0;
-            for (int j = 0; j < image.getWidth(); j++) {
-                if (new Color(image.getRGB(j, i)).equals(new Color(128, 128, 128))) {
-                    count++;
-                }
-            }
-            int max = Math.max(this.lineWidth, count);
-            if (max == count) {
-                line = i;
-                this.lineWidth = count;
-            }
-        }
-        for (int i = 0; i < image.getWidth(); i++) {
-            if (new Color(image.getRGB(i, line)).equals(new Color(128, 128, 128))) {
-                this.xMargin = i;
-                break;
-            }
-        }
+        this.displayIcon = new HiDpiImageIcon(image, width, height);
+        rebuildImageState(image);
     }
 
     public int getLineWidth() {
@@ -763,38 +743,15 @@ class MediaMatrixChart implements Serializable {
     }
 
     public void setImage(BufferedImage image) {
-        this.image = image;
-        this.alphaImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        final Graphics2D g2 = (Graphics2D) alphaImage.getGraphics();
-        for (int i = 0; i < image.getWidth(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
-                Color c = new Color(image.getRGB(i, j));
-                g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 120));
-                g2.drawLine(i, j, i, j);
-            }
+        final boolean transparent = isTransparent();
+        rebuildImageState(image);
+        if (displayIcon != null) {
+            displayIcon.setLogicalSize(width, height);
+            displayIcon.setImage(transparent ? alphaImage : this.image);
         }
-
-        int line = 0;
-        for (int i = image.getHeight() - 1; i >= 0; i--) {
-            int count = 0;
-            for (int j = 0; j < image.getWidth(); j++) {
-                if (new Color(image.getRGB(j, i)).equals(new Color(128, 128, 128))) {
-                    count++;
-                }
-            }
-            int max = Math.max(this.lineWidth, count);
-            if (max == count) {
-                line = i;
-                this.lineWidth = count;
-            }
+        if (label != null) {
+            label.repaint();
         }
-        for (int i = 0; i < image.getWidth(); i++) {
-            if (new Color(image.getRGB(i, line)).equals(new Color(128, 128, 128))) {
-                this.xMargin = x;
-                break;
-            }
-        }
-
     }
 
     public BufferedImage getAlphaImage() {
@@ -814,15 +771,16 @@ class MediaMatrixChart implements Serializable {
     }
 
     public void setTransparent(boolean trans) {
-        if (trans) {
-            ((ImageIcon) label.getIcon()).setImage(alphaImage);
-        } else {
-            ((ImageIcon) label.getIcon()).setImage(image);
+        if (displayIcon != null) {
+            displayIcon.setImage(trans ? alphaImage : image);
+        }
+        if (label != null) {
+            label.repaint();
         }
     }
 
     public boolean isTransparent() {
-        return ((ImageIcon) label.getIcon()).getImage() == alphaImage;
+        return displayIcon != null && displayIcon.getImage() == alphaImage;
     }
 
     public JLabel getLabel() {
@@ -831,6 +789,9 @@ class MediaMatrixChart implements Serializable {
 
     public void setLabel(JLabel label) {
         this.label = label;
+        if (label != null && displayIcon != null) {
+            label.setIcon(displayIcon);
+        }
     }
 
     public BufferedImage getImage() {
@@ -843,6 +804,9 @@ class MediaMatrixChart implements Serializable {
 
     public void setHeight(int height) {
         this.height = height;
+        if (displayIcon != null) {
+            displayIcon.setLogicalSize(width, height);
+        }
     }
 
     public int getWidth() {
@@ -851,6 +815,9 @@ class MediaMatrixChart implements Serializable {
 
     public void setWidth(int width) {
         this.width = width;
+        if (displayIcon != null) {
+            displayIcon.setLogicalSize(width, height);
+        }
     }
 
     public int getX() {
@@ -883,5 +850,56 @@ class MediaMatrixChart implements Serializable {
 
     public void setPreviousY(int previousY) {
         this.previousY = previousY;
+    }
+
+    public HiDpiImageIcon getDisplayIcon() {
+        return displayIcon;
+    }
+
+    private void rebuildImageState(BufferedImage source) {
+        this.image = source;
+        this.alphaImage = createAlphaImage(source);
+        recalculateLineMetrics(source);
+    }
+
+    private BufferedImage createAlphaImage(BufferedImage source) {
+        final BufferedImage result = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        final Graphics2D g2 = result.createGraphics();
+        try {
+            g2.setComposite(AlphaComposite.Src);
+            g2.setColor(new Color(0, 0, 0, 0));
+            g2.fillRect(0, 0, source.getWidth(), source.getHeight());
+            g2.setComposite(AlphaComposite.SrcOver.derive(120f / 255f));
+            g2.drawImage(source, 0, 0, null);
+        } finally {
+            g2.dispose();
+        }
+        return result;
+    }
+
+    private void recalculateLineMetrics(BufferedImage source) {
+        final double scale = width > 0 ? (double) source.getWidth() / (double) width : 1.0;
+        int line = 0;
+        int physicalLineWidth = 0;
+        for (int i = source.getHeight() - 1; i >= 0; i--) {
+            int count = 0;
+            for (int j = 0; j < source.getWidth(); j++) {
+                if (new Color(source.getRGB(j, i)).equals(new Color(128, 128, 128))) {
+                    count++;
+                }
+            }
+            if (count >= physicalLineWidth) {
+                line = i;
+                physicalLineWidth = count;
+            }
+        }
+        lineWidth = Math.max(1, (int) Math.round(physicalLineWidth / scale));
+        xMargin = 0;
+        for (int i = 0; i < source.getWidth(); i++) {
+            if (new Color(source.getRGB(i, line)).equals(new Color(128, 128, 128))) {
+                xMargin = (int) Math.round(i / scale);
+                break;
+            }
+        }
     }
 }

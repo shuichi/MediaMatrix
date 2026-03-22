@@ -314,7 +314,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         execMenuItem = new javax.swing.JMenuItem();
         csMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
-        javaVMMenuItem = new javax.swing.JMenuItem();
         aboutMenuItem = new javax.swing.JMenuItem();
 
         fileChooser.setDialogTitle("Open Database Directory");
@@ -332,16 +331,12 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
             }
         });
 
-        aToolBar.setFloatable(false);
         aToolBar.setRollover(true);
         aToolBar.setOpaque(false);
         getContentPane().add(aToolBar, java.awt.BorderLayout.NORTH);
 
-        mainSplitPane.setContinuousLayout(true);
-
         qrSplitPane.setDividerLocation(200);
         qrSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        qrSplitPane.setContinuousLayout(true);
 
         aTabbedPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         qrSplitPane.setRightComponent(aTabbedPane);
@@ -432,15 +427,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         helpMenu.setMnemonic('H');
         helpMenu.setText("Help");
 
-        javaVMMenuItem.setMnemonic('J');
-        javaVMMenuItem.setText("Java VM Memory Usage");
-        javaVMMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                javaVMMenuItemActionPerformed(evt);
-            }
-        });
-        helpMenu.add(javaVMMenuItem);
-
         aboutMenuItem.setMnemonic('A');
         aboutMenuItem.setText("About MediaMatrix");
         aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -493,10 +479,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_saveMenuItemActionPerformed
 
-    private void javaVMMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_javaVMMenuItemActionPerformed
-        DialogUtils.showJVMMemoryStatDialog(this);
-    }//GEN-LAST:event_javaVMMenuItemActionPerformed
-
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         storePrefs();
     }//GEN-LAST:event_formWindowClosing
@@ -542,7 +524,6 @@ public final class MediaMatrixDatabaseFrame extends javax.swing.JFrame {
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JMenuItem javaVMMenuItem;
     private javax.swing.JSplitPane mainSplitPane;
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JMenuItem openQueryMenuItem;

@@ -18,7 +18,6 @@ import java.util.concurrent.ExecutionException;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -27,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
@@ -69,13 +69,17 @@ public final class VideoMediaMatrixVisualizerPanel extends JPanel {
                 popup.add(saveAs);
                 canvas = new JLabel();
                 canvas.setHorizontalAlignment(SwingConstants.CENTER);
+                final HiDpiSupport.ScaleFactor scaleFactor = HiDpiSupport.scaleFactor(canvas);
                 canvas.addMouseListener(new MouseAdapter() {
 
                     @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
-                            popup.show(e.getComponent(), e.getX(), e.getY());
-                        }
+                    public void mousePressed(MouseEvent e) {
+                        showPopupIfNeeded(e);
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        showPopupIfNeeded(e);
                     }
                 });
                 list = new JList<>();
@@ -169,7 +173,7 @@ public final class VideoMediaMatrixVisualizerPanel extends JPanel {
                     @Override
                     protected VisualizeResult doInBackground() throws Exception {
                         final ImageShotListModel model = new ImageShotListModel(new PrimitiveEngine().getImageShotList(matrix, t));
-                        image = new VisualizationEngine().createChartImage(matrix, Color.lightGray, width, height);
+                        image = new VisualizationEngine().createChartImage(matrix, Color.lightGray, width, height, scaleFactor.scaleX(), scaleFactor.scaleY());
                         final ColorImpressionKnowledge ci = new ChronoArchive(script.getTarget()).getColorImpressionKnowledge();
                         return new VisualizeResult(image, model, matrix, ci);
                     }
@@ -178,7 +182,7 @@ public final class VideoMediaMatrixVisualizerPanel extends JPanel {
                     protected void done() {
                         try {
                             result = get();
-                            canvas.setIcon(new ImageIcon(result.getImage()));
+                            canvas.setIcon(new HiDpiImageIcon(result.getImage(), width, height));
                             label.setBusy(false);
                             remove(label);
                             add(new JScrollPane(canvas), BorderLayout.CENTER);
@@ -192,6 +196,13 @@ public final class VideoMediaMatrixVisualizerPanel extends JPanel {
                         }
                     }
                 }.execute();
+            }
+
+            private void showPopupIfNeeded(MouseEvent e) {
+                if (!e.isPopupTrigger() && !SwingUtilities.isRightMouseButton(e) && !(e.getButton() == MouseEvent.BUTTON1 && e.isMetaDown())) {
+                    return;
+                }
+                popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }, BorderLayout.CENTER);
     }
