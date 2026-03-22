@@ -29,9 +29,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
-
-import javax.swing.UIManager;
-
 import mediamatrix.db.FFMpegShotSet;
 import mediamatrix.gui.AboutDialog;
 import mediamatrix.gui.ErrorUtils;

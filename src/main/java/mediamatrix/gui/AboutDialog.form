@@ -182,7 +182,7 @@
                 <Property name="columns" type="int" value="20"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="MediaMatrix includes/uses the following software.&#xa;&#xa;Apache Commons JEXL version 3.6.1&#xa;http://commons.apache.org/jexl/&#xa;Licensed under the Apache License, Version 2.0&#xa;&#xa;FlatLaf Version 3.7&#xa;https://www.formdev.com/flatlaf/&#xa;Licensed under the Apache License, Version 2.0&#xa;&#xa;Apache NetBeans Absolute Layout RELEASE280&#xa;https://netbeans.apache.org&#xa;Licensed under the Apache License, Version 2.0" noResource="true"/>
+                <Property name="text" type="java.lang.String" value="MediaMatrix includes/uses the following software.&#xa;&#xa;Apache Commons JEXL version 3.6.1&#xa;http://commons.apache.org/jexl/&#xa;Licensed under the Apache License, Version 2.0&#xa;&#xa;FlatLaf Version 3.7&#xa;https://www.formdev.com/flatlaf/&#xa;Licensed under the Apache License, Version 2.0&#xa;&#xa;FlatLaf Extras Version 3.7&#xa;https://www.formdev.com/flatlaf/&#xa;Licensed under the Apache License, Version 2.0&#xa;&#xa;JSVG Version 2.0.0&#xa;https://github.com/weisJ/jsvg&#xa;Licensed under the MIT License&#xa;&#xa;Apache NetBeans Absolute Layout RELEASE280&#xa;https://netbeans.apache.org&#xa;Licensed under the Apache License, Version 2.0&#xa;" noResource="true"/>
               </Properties>
             </Component>
           </SubComponents>
