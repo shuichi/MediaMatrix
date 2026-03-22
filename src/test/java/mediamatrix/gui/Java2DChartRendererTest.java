@@ -1,33 +1,102 @@
 package mediamatrix.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import mediamatrix.db.MediaMatrix;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYSplineRenderer;
-import org.jfree.chart.title.LegendTitle;
-import org.jfree.chart.ui.RectangleInsets;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.jupiter.api.Test;
 
 class Java2DChartRendererTest {
 
     @Test
-    void rendersImageCloseToJFreeChartOutput() {
+    void rendersMatrixChartWithExpectedSize() {
         final MediaMatrix matrix = createSampleMatrix();
         final BufferedImage actual = new Java2DChartRenderer().createChartImage(matrix, Color.LIGHT_GRAY, 900, 420);
-        final BufferedImage expected = createBaseline(matrix, Color.LIGHT_GRAY, 900, 420);
 
-        assertEquals(expected.getWidth(), actual.getWidth());
-        assertEquals(expected.getHeight(), actual.getHeight());
-        assertTrue(averagePixelDifference(expected, actual) < 35.0);
+        assertEquals(900, actual.getWidth());
+        assertEquals(420, actual.getHeight());
+        assertContainsNonBackgroundPixels(actual, Color.white.getRGB());
+    }
+
+    @Test
+    void rendersSingleSeriesSplineChart() {
+        final Java2DChartRenderer.ChartSpec spec = new Java2DChartRenderer.ChartSpec(
+                List.of(new Java2DChartRenderer.SeriesData(
+                        "Velocity",
+                        new double[] {0.25, 1.0, 2.4, 3.8, 5.0},
+                        new double[] {36.0, 48.0, 44.0, 60.0, 52.0},
+                        Java2DChartRenderer.SeriesStyle.spline(Color.black, 1.0f, false))),
+                Java2DChartRenderer.ChartStyle.xyPanelStyle("Velocity", "Value"));
+
+        final BufferedImage actual = new Java2DChartRenderer().createChartImage(spec, 760, 320);
+
+        assertEquals(760, actual.getWidth());
+        assertEquals(320, actual.getHeight());
+        assertContainsColor(actual, Color.black.getRGB());
+    }
+
+    @Test
+    void rendersStepChart() {
+        final Java2DChartRenderer.ChartSpec spec = new Java2DChartRenderer.ChartSpec(
+                List.of(new Java2DChartRenderer.SeriesData(
+                        "Tempo",
+                        new double[] {0.0, 1.0, 2.5, 3.2, 4.8},
+                        new double[] {120.0, 120.0, 136.0, 96.0, 144.0},
+                        Java2DChartRenderer.SeriesStyle.step(Color.black, 3.0f))),
+                Java2DChartRenderer.ChartStyle.xyPanelStyle("Tempo", "Value"));
+
+        final BufferedImage actual = new Java2DChartRenderer().createChartImage(spec, 760, 320);
+
+        assertEquals(760, actual.getWidth());
+        assertEquals(320, actual.getHeight());
+        assertContainsColor(actual, Color.black.getRGB());
+    }
+
+    @Test
+    void rendersScatterChartWithFixedRange() {
+        final Java2DChartRenderer.ChartSpec spec = new Java2DChartRenderer.ChartSpec(
+                List.of(new Java2DChartRenderer.SeriesData(
+                        "Note",
+                        new double[] {0.25, 0.75, 1.25, 1.75, 2.25, 2.75},
+                        new double[] {42.0, 47.0, 55.0, 51.0, 63.0, 60.0},
+                        Java2DChartRenderer.SeriesStyle.scatter(Color.black, 2, 2))),
+                Java2DChartRenderer.ChartStyle.xyPanelStyle("Pitch", "Pitch"),
+                null,
+                new Java2DChartRenderer.AxisRange(0.0, 127.0));
+
+        final BufferedImage actual = new Java2DChartRenderer().createChartImage(spec, 760, 320);
+
+        assertEquals(760, actual.getWidth());
+        assertEquals(320, actual.getHeight());
+        assertContainsColor(actual, Color.black.getRGB());
+    }
+
+    @Test
+    void chartSpecAffectsRenderedOutput() {
+        final Java2DChartRenderer renderer = new Java2DChartRenderer();
+        final Java2DChartRenderer.ChartSpec left = new Java2DChartRenderer.ChartSpec(
+                List.of(new Java2DChartRenderer.SeriesData(
+                        "Series",
+                        new double[] {0.0, 1.0, 2.0},
+                        new double[] {10.0, 20.0, 30.0},
+                        Java2DChartRenderer.SeriesStyle.spline(Color.black, 1.0f, false))),
+                Java2DChartRenderer.ChartStyle.xyPanelStyle("A", "Value"));
+        final Java2DChartRenderer.ChartSpec right = new Java2DChartRenderer.ChartSpec(
+                List.of(new Java2DChartRenderer.SeriesData(
+                        "Series",
+                        new double[] {0.0, 1.0, 2.0},
+                        new double[] {30.0, 20.0, 10.0},
+                        Java2DChartRenderer.SeriesStyle.spline(Color.black, 1.0f, false))),
+                Java2DChartRenderer.ChartStyle.xyPanelStyle("B", "Value"));
+
+        final BufferedImage first = renderer.createChartImage(left, 600, 240);
+        final BufferedImage second = renderer.createChartImage(right, 600, 240);
+
+        assertNotEquals(imageFingerprint(first), imageFingerprint(second));
     }
 
     @Test
@@ -63,46 +132,40 @@ class Java2DChartRendererTest {
         return matrix;
     }
 
-    private static BufferedImage createBaseline(MediaMatrix matrix, Color bgColor, int width, int height) {
-        final XYSplineRenderer renderer = new XYSplineRenderer();
-        final NumberAxis xAxis = new NumberAxis("Time");
-        final NumberAxis yAxis = new NumberAxis("Score");
-        final XYPlot plot = new XYPlot(createDataset(matrix), xAxis, yAxis, renderer);
-        plot.setBackgroundPaint(bgColor);
-        plot.setDomainGridlinePaint(Color.white);
-        plot.setRangeGridlinePaint(Color.white);
-        plot.setAxisOffset(new RectangleInsets(4, 4, 4, 4));
-        final JFreeChart chart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-        chart.setBackgroundPaint(Color.white);
-        final LegendTitle legendTitle = chart.getLegend();
-        legendTitle.setItemFont(new Font("SanSerif", Font.PLAIN, 14));
-        return chart.createBufferedImage(width, height);
-    }
-
-    private static XYSeriesCollection createDataset(MediaMatrix matrix) {
-        final XYSeriesCollection dataset = new XYSeriesCollection();
-        for (int column = 0; column < matrix.getWidth(); column++) {
-            final XYSeries series = new XYSeries(matrix.getColumn(column));
-            for (int row = 0; row < matrix.getHeight(); row++) {
-                series.add(row, matrix.get(row, column));
-            }
-            dataset.addSeries(series);
-        }
-        return dataset;
-    }
-
-    private static double averagePixelDifference(BufferedImage expected, BufferedImage actual) {
-        long total = 0;
-        final long pixels = (long) expected.getWidth() * expected.getHeight();
-        for (int y = 0; y < expected.getHeight(); y++) {
-            for (int x = 0; x < expected.getWidth(); x++) {
-                final int expectedRgb = expected.getRGB(x, y);
-                final int actualRgb = actual.getRGB(x, y);
-                total += Math.abs(((expectedRgb >> 16) & 0xFF) - ((actualRgb >> 16) & 0xFF));
-                total += Math.abs(((expectedRgb >> 8) & 0xFF) - ((actualRgb >> 8) & 0xFF));
-                total += Math.abs((expectedRgb & 0xFF) - (actualRgb & 0xFF));
+    private static void assertContainsNonBackgroundPixels(BufferedImage image, int backgroundRgb) {
+        boolean found = false;
+        for (int y = 0; y < image.getHeight() && !found; y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (image.getRGB(x, y) != backgroundRgb) {
+                    found = true;
+                    break;
+                }
             }
         }
-        return total / (double) pixels;
+        assertTrue(found);
+    }
+
+    private static void assertContainsColor(BufferedImage image, int rgb) {
+        boolean found = false;
+        for (int y = 0; y < image.getHeight() && !found; y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (image.getRGB(x, y) == rgb) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        assertTrue(found);
+    }
+
+    private static long imageFingerprint(BufferedImage image) {
+        long hash = 1469598103934665603L;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                hash ^= image.getRGB(x, y);
+                hash *= 1099511628211L;
+            }
+        }
+        return hash;
     }
 }

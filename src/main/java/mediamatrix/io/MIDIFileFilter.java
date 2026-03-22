@@ -13,12 +13,12 @@ public class MIDIFileFilter extends javax.swing.filechooser.FileFilter implement
             return true;
         }
         String name = file.getName();
-        return name.endsWith(".mid") || name.endsWith(".MID") || name.endsWith(".smf") || name.endsWith(".SMF");
+        return name.endsWith(".midi") || name.endsWith(".MIDI") || name.endsWith(".mid") || name.endsWith(".MID") || name.endsWith(".smf") || name.endsWith(".SMF");
     }
 
     @Override
     public boolean accept(File dir, String name) {
-        return name.endsWith(".mid") || name.endsWith(".MID") || name.endsWith(".smf") || name.endsWith(".SMF");
+        return name.endsWith(".midi") || name.endsWith(".MIDI") || name.endsWith(".mid") || name.endsWith(".MID") || name.endsWith(".smf") || name.endsWith(".SMF");
     }
 
     public File[] filter(File[] files) {

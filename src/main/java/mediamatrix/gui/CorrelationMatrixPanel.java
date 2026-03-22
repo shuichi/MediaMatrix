@@ -2,7 +2,6 @@ package mediamatrix.gui;
 
 import mediamatrix.db.CorrelationMatrix;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -16,17 +15,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYSplineRenderer;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 import static java.math.RoundingMode.HALF_UP;
 
@@ -89,40 +81,36 @@ public final class CorrelationMatrixPanel extends JPanel {
         }
         pane.setRowHeaderView(new RowHeaderList(model, aTable));
 
-        NumberAxis xAxis = new NumberAxis("Time");
-        NumberAxis yAxis = new NumberAxis("Correlation");
-        XYSeries series = new XYSeries("Correlation");
-        final Font font = new Font("SanSerif", Font.PLAIN, 14);
-        xAxis.setLabelFont(font);
-        yAxis.setLabelFont(font);
-        xAxis.setTickLabelFont(font);
-        yAxis.setTickLabelFont(font);
-
+        final ArrayList<Double> xValues = new ArrayList<>();
+        final ArrayList<Double> yValues = new ArrayList<>();
         if (matrix.getHeight() == 1) {
             for (int i = 0; i < matrix.getWidth(); i++) {
-                series.add(i, matrix.get(i, 0));
+                xValues.add((double) i);
+                yValues.add(matrix.get(i, 0));
             }
         } else {
             final int slideNum = matrix.mostRelevantShift();
             final double[] values = matrix.getShift(slideNum);
             for (int i = 0; i < values.length; i++) {
-                series.add(i, values[i]);
+                xValues.add((double) i);
+                yValues.add(values[i]);
             }
         }
 
-        final XYSeriesCollection data = new XYSeriesCollection(series);
-        xAxis.setAutoRangeIncludesZero(false);
-        yAxis.setAutoRangeIncludesZero(false);
-        final XYPlot plot = new XYPlot(data, xAxis, yAxis, new XYSplineRenderer());
-        plot.getRenderer().setSeriesStroke(0, new BasicStroke(3.0f));
-        final JFreeChart chart = new JFreeChart("Correlation Vector", JFreeChart.DEFAULT_TITLE_FONT, plot, false);
-        chart.setBackgroundPaint(Color.white);
-        final ChartPanel chartPanel = new ChartPanel(chart, false);
+        final Java2DChartRenderer.SeriesData series = new Java2DChartRenderer.SeriesData(
+                "Correlation",
+                toArray(xValues),
+                toArray(yValues),
+                Java2DChartRenderer.SeriesStyle.spline(Color.black, 3.0f, false));
+        final Java2DChartImagePanel chartPanel = new Java2DChartImagePanel(new Java2DChartRenderer.ChartSpec(
+                java.util.List.of(series),
+                Java2DChartRenderer.ChartStyle.xyPanelStyle("Correlation Vector", "Correlation", Color.lightGray, Color.white)));
         final JTabbedPane tab = new JTabbedPane();
         tab.add("Matrix", pane);
         tab.add("Graph", chartPanel);
         setSlashPoint(matrix.mostRelevantShift());
         add(tab, BorderLayout.CENTER);
+        SwingUtilities.invokeLater(chartPanel::requestRender);
     }
 
     private void setSlashPoint(int num) {
@@ -142,6 +130,14 @@ public final class CorrelationMatrixPanel extends JPanel {
                 renderer.setColoredCell(i, i - num);
             }
         }
+    }
+
+    private static double[] toArray(ArrayList<Double> values) {
+        final double[] result = new double[values.size()];
+        for (int i = 0; i < values.size(); i++) {
+            result[i] = values.get(i);
+        }
+        return result;
     }
 }
 

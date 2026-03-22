@@ -111,7 +111,7 @@ public final class AboutDialog extends javax.swing.JDialog {
         componentsTextArea.setColumns(20);
         componentsTextArea.setLineWrap(true);
         componentsTextArea.setRows(5);
-        componentsTextArea.setText("MediaMatrix includes/uses the following software.\n\nApache Commons JEXL version 3.6.1\nhttp://commons.apache.org/jexl/\nLicensed under the Apache License, Version 2.0\n\nThe JFreeChart Class Library Version 1.5.6\nhttp://www.jfree.org/jfreechart/\nLicensed under the terms of the GNU Lesser General Public Licence (LGPL) version 2.1 or later.\n\nFlatLaf Version 3.7\nhttps://www.formdev.com/flatlaf/\nLicensed under the Apache License, Version 2.0\n\nApache NetBeans Absolute Layout RELEASE280\nhttps://netbeans.apache.org\nLicensed under the Apache License, Version 2.0"); // NOI18N
+        componentsTextArea.setText("MediaMatrix includes/uses the following software.\n\nApache Commons JEXL version 3.6.1\nhttp://commons.apache.org/jexl/\nLicensed under the Apache License, Version 2.0\n\nFlatLaf Version 3.7\nhttps://www.formdev.com/flatlaf/\nLicensed under the Apache License, Version 2.0\n\nApache NetBeans Absolute Layout RELEASE280\nhttps://netbeans.apache.org\nLicensed under the Apache License, Version 2.0"); // NOI18N
         componentsScrollPane.setViewportView(componentsTextArea);
 
         aTabbedPane.addTab("Components", componentsScrollPane);

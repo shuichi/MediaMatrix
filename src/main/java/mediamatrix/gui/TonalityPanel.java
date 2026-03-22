@@ -1,87 +1,59 @@
 package mediamatrix.gui;
 
-import mediamatrix.mvc.MediaMatrixXYDataSetAdapter;
 import mediamatrix.db.MediaMatrix;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYSplineRenderer;
-import org.jfree.chart.title.LegendTitle;
-import org.jfree.data.xy.XYDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.chart.ui.RectangleInsets;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import javax.swing.SwingUtilities;
 
 public final class TonalityPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private ChartPanel chartPanel = new ChartPanel(null);
-    private XYSplineRenderer renderer = new XYSplineRenderer();
-    private NumberAxis xAxis = new NumberAxis("Time");
-    private NumberAxis yAxis = new NumberAxis("Score");
-    private MediaMatrixPanel matrixPanel;
-    private MediaMatrix mat;
+    private final MediaMatrixJava2DChartPanel chartPanel;
+    private final MediaMatrixPanel matrixPanel;
+    private final MediaMatrix mat;
     private Color bgColor = Color.lightGray;
 
     public TonalityPanel(MediaMatrix mat) {
         initComponents();
         this.mat = mat;
-        renderer.setDefaultToolTipGenerator((XYDataset dataset, int series, int item) -> {
-            final XYSeriesCollection collection = (XYSeriesCollection) dataset;
-            final XYSeries xyseries = collection.getSeries(series);
-            final XYDataItem xyitem = xyseries.getDataItem(item);
-            return xyseries.getKey().toString() + ": " + xyitem.getYValue();
+        chartPanel = new MediaMatrixJava2DChartPanel(mat, createChartStyle());
+        matrixPanel = new MediaMatrixPanel(mat);
+        chartScrollPane.setViewportView(chartPanel);
+        aTabbedPane.addTab("Matrix", matrixPanel);
+        chartScrollPane.getViewport().addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                if (!scrollCheckBox.isSelected()) {
+                    redraw();
+                }
+            }
         });
-        chartPanel.setDisplayToolTips(true);
-        chartPanel.setMaximumDrawHeight(2000);
-        xAxis.setAutoRangeIncludesZero(false);
-        yAxis.setAutoRangeIncludesZero(false);
-        final Font font = new Font("SanSerif", Font.PLAIN, 14);
-        xAxis.setLabelFont(font);
-        yAxis.setLabelFont(font);
-        xAxis.setTickLabelFont(font);
-        yAxis.setTickLabelFont(font);
         redraw();
     }
 
     private void redraw() {
-        final XYPlot plot = new XYPlot(new MediaMatrixXYDataSetAdapter(mat), xAxis, yAxis, renderer);
-        plot.setBackgroundPaint(bgColor);
-        plot.setDomainGridlinePaint(Color.white);
-        plot.setRangeGridlinePaint(Color.white);
-        plot.setAxisOffset(new RectangleInsets(4, 4, 4, 4));
-        final JFreeChart chart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-        chart.setBackgroundPaint(Color.white);
-        chartPanel.setChart(chart);
-        final LegendTitle legendTitle = chart.getLegend();
-        legendTitle.setItemFont(new Font("SanSerif", Font.PLAIN, 14));
+        chartPanel.setChartStyle(createChartStyle());
+        chartPanel.setChartSize(resolveChartSize());
         if (scrollCheckBox.isSelected()) {
-            final Dimension size = new Dimension(mat.getRows().length * 5, 400);
-            chartPanel.setMaximumDrawWidth(100000);
-            chartPanel.setMaximumDrawHeight(100000);
-            chartPanel.setSize(size);
-            chartPanel.setPreferredSize(size);
-        } else {
-            final Dimension size = new Dimension(chartScrollPane.getSize());
-            size.height = mat.getWidth() * 5;
-            chartPanel.setSize(size);
-            chartPanel.setPreferredSize(size);
+            chartScrollPane.getHorizontalScrollBar().setUnitIncrement(24);
         }
-        chartPanel.setDomainZoomable(true);
-        chartPanel.setRangeZoomable(true);
-
-        if (matrixPanel != null) {
-            aTabbedPane.remove(matrixPanel);
-        }
-        matrixPanel = new MediaMatrixPanel(mat);
-        aTabbedPane.addTab("Matrix", matrixPanel);
-        chartScrollPane.setViewportView(chartPanel);
+        SwingUtilities.invokeLater(chartPanel::requestRender);
         repaint();
+    }
+
+    private Java2DChartRenderer.ChartStyle createChartStyle() {
+        return Java2DChartRenderer.ChartStyle.splinePanelStyle(bgColor, Color.white);
+    }
+
+    private Dimension resolveChartSize() {
+        if (scrollCheckBox.isSelected()) {
+            return new Dimension(Math.max(1, mat.getRows().length * 5), 400);
+        }
+        final Dimension extent = chartScrollPane.getViewport().getExtentSize();
+        final int width = Math.max(1, extent.width > 0 ? extent.width : chartScrollPane.getWidth());
+        return new Dimension(width, Math.max(1, mat.getWidth() * 5));
     }
 
     @SuppressWarnings("unchecked")

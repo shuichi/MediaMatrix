@@ -28,7 +28,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jfree:jfreechart:1.5.6'
     implementation 'com.formdev:flatlaf:3.7'
     implementation 'com.formdev:flatlaf-extras:3.7'
     implementation 'com.github.weisj:jsvg:2.0.0'
@@ -40,13 +39,6 @@ dependencies {
 }
 
 extraJavaModuleInfo {
-    module("org.jfree:jfreechart", "org.jfree.jfreechart") {
-        requiresTransitive("java.datatransfer")
-        requiresTransitive("java.desktop")
-        requiresTransitive("java.sql")
-        requiresTransitive("java.xml")
-        exportAllPackages()
-    }
     module("org.netbeans.external:AbsoluteLayout", "org.netbeans.lib.awtextra") {
         requiresTransitive("java.desktop")
         exports("org.netbeans.lib.awtextra")
@@ -62,7 +54,7 @@ extraJavaModuleInfo {
 }
 
 tasks.named('test') {
-    useJUnitPlatform() 
+    useJUnitPlatform()
 }
 
 wrapper {
