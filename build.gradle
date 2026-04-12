@@ -5,7 +5,7 @@ plugins {
     id 'org.gradlex.extra-java-module-info' version '1.14'
 }
 
-def targetJava = 26
+def targetJava = 25
 def targetJavaVersion = JavaLanguageVersion.of(targetJava)
 def jvmArgs = [
         '--enable-native-access=com.formdev.flatlaf'
