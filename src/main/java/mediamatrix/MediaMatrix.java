@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
+import javax.swing.JOptionPane;
 import mediamatrix.db.FFMpegShotSet;
 import mediamatrix.gui.AboutDialog;
 import mediamatrix.gui.ErrorUtils;
@@ -69,10 +70,19 @@ public class MediaMatrix {
 
         try {
             if (System.getProperty("ffmpeg") == null) {
-                System.setProperty("ffmpeg", FFMpegShotSet.findExecutable("ffmpeg").getAbsolutePath());
+                File ffmpeg = FFMpegShotSet.findExecutable("ffmpeg");
+                if (ffmpeg == null) {
+                    showFFMpegNotFoundDialogAndExit();
+                }
+                System.setProperty("ffmpeg", ffmpeg.getAbsolutePath());
             }
             System.setProperty("ffmpeg.version", FFMpegShotSet.version());
         } catch (IOException | InterruptedException ex) {
+            if (ex instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            ErrorUtils.showDialog(ex);
+            System.exit(1);
         }
 
         java.awt.EventQueue.invokeLater(() -> {
@@ -94,5 +104,14 @@ public class MediaMatrix {
                 ErrorUtils.showDialog(ex);
             }
         });
+    }
+
+    private static void showFFMpegNotFoundDialogAndExit() {
+        JOptionPane.showMessageDialog(
+                null,
+                "ffmpeg was not found on the system path.\nPlease install ffmpeg and add it to PATH.",
+                "ERROR",
+                JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
     }
 }
